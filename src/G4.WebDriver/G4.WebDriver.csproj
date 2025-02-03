@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<!-- Assembly -->
+		<TargetFramework>net8.0</TargetFramework>
+		<AssemblyVersion>8.0.0.0</AssemblyVersion>
+		<FileVersion>8.0.0.0</FileVersion>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+		<LangVersion>latest</LangVersion>
+
+		<!-- Package -->
+		<PackageId>G4.WebDriver</PackageId>
+		<Title>G4.WebDriver</Title>
+		<PackageProjectUrl>https://github.com/g4-api</PackageProjectUrl>
+		<Authors>G4™ API Community</Authors>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageLicenseExpression>Apache-2.0+</PackageLicenseExpression>
+		<PackageReadmeFile>G4.WebDriver.md</PackageReadmeFile>
+		<Description>The G4.WebDriver package seamlessly integrates with WebDriver backends through the WebDriver protocol, offering a powerful and extensible framework for web automation and testing. While designed for compatibility with the G4™ ecosystem, this package can be employed independently in any .NET project, providing a standardized interface for controlling web browsers remotely. Utilize the feature-rich RemoteWebDriver class to streamline web automation tasks, ensuring compatibility and interoperability across diverse environments.</Description>
+		<PackageTags>WebDriver;Automation;Testing;RPA;G4</PackageTags>
+		<Copyright>Copyright 2023 (c) Roei Sabag &amp; HRC Corporation. All rights reserved.</Copyright>
+
+		<!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/syslib-diagnostics/syslib1040-1049 -->
+		<NoWarn>$(NoWarn);SYSLIB1045</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\packages-readme\G4.WebDriver.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+</Project>

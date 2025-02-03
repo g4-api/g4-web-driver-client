@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<!-- Assembly -->
+		<TargetFramework>net8.0</TargetFramework>
+		<AssemblyVersion>8.0.0.0</AssemblyVersion>
+		<FileVersion>8.0.0.0</FileVersion>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+		<LangVersion>latest</LangVersion>
+
+		<!-- Package -->
+		<PackageId>G4.WebDriver.Remote.Android</PackageId>
+		<Title>G4.WebDriver.Remote.Android</Title>
+		<PackageProjectUrl>https://github.com/g4-api</PackageProjectUrl>
+		<Authors>G4™ API Community</Authors>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageLicenseExpression>Apache-2.0+</PackageLicenseExpression>
+		<PackageReadmeFile>G4.WebDriver.Remote.Android</PackageReadmeFile>
+		<Description>The G4.WebDriver.Remote.Android package is a foundational library for interacting with Android devices through the Appium WebDriver. This library facilitates seamless communication with Appium WebDriver, enabling effective automation within the G4™ ecosystem and other automation environments. Offering versatility, it provides a reliable interface for remote communication with Android devices, making it an essential component for automation projects.</Description>
+		<PackageTags>WebDriver;Automation;Testing;RPA;G4;Appium;Mobile;Android;AndroidDriver</PackageTags>
+		<Copyright>Copyright 2023 (c) Roei Sabag &amp; HRC Corporation. All rights reserved.</Copyright>
+
+		<!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/syslib-diagnostics/syslib1040-1049 -->
+		<NoWarn>$(NoWarn);SYSLIB1045</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\packages-readme\G4.WebDriver.Remote.Android.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\G4.WebDriver.Remote.Appium\G4.WebDriver.Remote.Appium.csproj" />
+	</ItemGroup>
+
+</Project>

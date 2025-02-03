@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<!-- Assembly -->
+		<TargetFramework>net8.0</TargetFramework>
+		<IsPackable>false</IsPackable>
+		<AssemblyVersion>8.0.0.0</AssemblyVersion>
+		<FileVersion>8.0.0.0</FileVersion>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+		<LangVersion>latest</LangVersion>
+
+		<!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/syslib-diagnostics/syslib1040-1049 -->
+		<NoWarn>$(NoWarn);SYSLIB1045,S2925,S2325</NoWarn>
+	</PropertyGroup>
+
+	<!-- Static Pages -->
+	<ItemGroup>
+		<Content Include="..\..\test\Pages\**\*.*">
+			<Link>Pages\%(RecursiveDir)%(FileName)%(Extension)</Link>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<!-- Binaries Local -->
+	<ItemGroup>
+		<Content Include="..\..\test\Binaries\**\*.*">
+			<Link>Binaries\%(RecursiveDir)%(FileName)%(Extension)</Link>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.MiddlewareAnalysis" Version="8.0.10" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+		<PackageReference Include="MSTest.TestAdapter" Version="3.6.3" />
+		<PackageReference Include="MSTest.TestFramework" Version="3.6.3" />
+		<PackageReference Include="coverlet.collector" Version="6.0.2">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\G4.WebDriver.Remote.Android\G4.WebDriver.Remote.Android.csproj" />
+		<ProjectReference Include="..\G4.WebDriver.Remote.Chrome\G4.WebDriver.Remote.Chrome.csproj" />
+		<ProjectReference Include="..\G4.WebDriver.Remote.Chromium\G4.WebDriver.Remote.Chromium.csproj" />
+		<ProjectReference Include="..\G4.WebDriver.Remote.Edge\G4.WebDriver.Remote.Edge.csproj" />
+		<ProjectReference Include="..\G4.WebDriver.Remote.Firefox\G4.WebDriver.Remote.Firefox.csproj" />
+		<ProjectReference Include="..\G4.WebDriver.Remote.Opera\G4.WebDriver.Remote.Opera.csproj" />
+		<ProjectReference Include="..\G4.WebDriver.Remote.Uia\G4.WebDriver.Remote.Uia.csproj" />
+		<ProjectReference Include="..\G4.WebDriver.Simulator\G4.WebDriver.Simulator.csproj" />
+		<ProjectReference Include="..\G4.WebDriver\G4.WebDriver.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="appsettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,128 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver", "G4.WebDriver\G4.WebDriver.csproj", "{3821BE27-7D3B-4508-BAF4-00389A8EA017}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Remote.Android", "G4.WebDriver.Remote.Android\G4.WebDriver.Remote.Android.csproj", "{F1F8A056-33B6-4E5B-8A60-031446B0A2DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Remote.Appium", "G4.WebDriver.Remote.Appium\G4.WebDriver.Remote.Appium.csproj", "{C5A9F687-E094-4B35-8B48-1955D3368914}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Remote.Chrome", "G4.WebDriver.Remote.Chrome\G4.WebDriver.Remote.Chrome.csproj", "{9E74BBD0-C44C-4987-9A7E-391FA6123BA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Remote.Chromium", "G4.WebDriver.Remote.Chromium\G4.WebDriver.Remote.Chromium.csproj", "{B3F46BEF-FBCD-41B2-A0E2-7819DD0C1486}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Remote.Edge", "G4.WebDriver.Remote.Edge\G4.WebDriver.Remote.Edge.csproj", "{CA4D7742-9A66-4DB8-8408-8FBA8C60BA3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Remote.Firefox", "G4.WebDriver.Remote.Firefox\G4.WebDriver.Remote.Firefox.csproj", "{593FCBF4-75BA-4F9F-B39F-820F9C3E3F50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Remote.Ios", "G4.WebDriver.Remote.Ios\G4.WebDriver.Remote.Ios.csproj", "{0FBB6744-846D-4799-BDB3-924883B662F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Remote.MacOs", "G4.WebDriver.Remote.MacOs\G4.WebDriver.Remote.MacOs.csproj", "{CA3F4886-B5D0-4818-B029-06E1B5808E3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Remote.Opera", "G4.WebDriver.Remote.Opera\G4.WebDriver.Remote.Opera.csproj", "{9A2954D9-42EE-4E1C-BA4C-54638CE2EC62}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Remote.Uia", "G4.WebDriver.Remote.Uia\G4.WebDriver.Remote.Uia.csproj", "{4F3603F6-E57E-4976-92E9-97BB71DE477A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Simulator", "G4.WebDriver.Simulator\G4.WebDriver.Simulator.csproj", "{7956AADD-2F11-4AB4-A417-B209B8510B60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Tests", "G4.WebDriver.Tests\G4.WebDriver.Tests.csproj", "{0FF3C742-D247-4AED-ACC0-2627AED0F0AA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".git", ".git", "{E18AEC5D-80B0-49FB-9E4F-49021307B787}"
+	ProjectSection(SolutionItems) = preProject
+		..\.gitignore = ..\.gitignore
+		..\LICENSE = ..\LICENSE
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{B32AB91E-B39C-448F-8427-A85606DBBCCF}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\release-pipline.yml = ..\.github\workflows\release-pipline.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".docs", ".docs", "{8AC59A83-CDDD-49CB-B574-861D000E89B4}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\packages-readme\G4.WebDriver.md = ..\docs\packages-readme\G4.WebDriver.md
+		..\docs\packages-readme\G4.WebDriver.Remote.Android.md = ..\docs\packages-readme\G4.WebDriver.Remote.Android.md
+		..\docs\packages-readme\G4.WebDriver.Remote.Appium.md = ..\docs\packages-readme\G4.WebDriver.Remote.Appium.md
+		..\docs\packages-readme\G4.WebDriver.Remote.Chrome.md = ..\docs\packages-readme\G4.WebDriver.Remote.Chrome.md
+		..\docs\packages-readme\G4.WebDriver.Remote.Chromium.md = ..\docs\packages-readme\G4.WebDriver.Remote.Chromium.md
+		..\docs\packages-readme\G4.WebDriver.Remote.Edge.md = ..\docs\packages-readme\G4.WebDriver.Remote.Edge.md
+		..\docs\packages-readme\G4.WebDriver.Remote.Firefox.md = ..\docs\packages-readme\G4.WebDriver.Remote.Firefox.md
+		..\docs\packages-readme\G4.WebDriver.Remote.Ios.md = ..\docs\packages-readme\G4.WebDriver.Remote.Ios.md
+		..\docs\packages-readme\G4.WebDriver.Remote.MacOs.md = ..\docs\packages-readme\G4.WebDriver.Remote.MacOs.md
+		..\docs\packages-readme\G4.WebDriver.Remote.Opera.md = ..\docs\packages-readme\G4.WebDriver.Remote.Opera.md
+		..\docs\packages-readme\G4.WebDriver.Remote.Uia.md = ..\docs\packages-readme\G4.WebDriver.Remote.Uia.md
+		..\docs\packages-readme\G4.WebDriver.Simulator.md = ..\docs\packages-readme\G4.WebDriver.Simulator.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".test", ".test", "{42501EC6-B315-4EFA-A3C2-F179DA47ECF7}"
+	ProjectSection(SolutionItems) = preProject
+		..\test\settings\Default.runsettings = ..\test\settings\Default.runsettings
+		..\test\settings\Local.runsettings = ..\test\settings\Local.runsettings
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3821BE27-7D3B-4508-BAF4-00389A8EA017}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3821BE27-7D3B-4508-BAF4-00389A8EA017}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3821BE27-7D3B-4508-BAF4-00389A8EA017}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3821BE27-7D3B-4508-BAF4-00389A8EA017}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1F8A056-33B6-4E5B-8A60-031446B0A2DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1F8A056-33B6-4E5B-8A60-031446B0A2DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1F8A056-33B6-4E5B-8A60-031446B0A2DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1F8A056-33B6-4E5B-8A60-031446B0A2DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5A9F687-E094-4B35-8B48-1955D3368914}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5A9F687-E094-4B35-8B48-1955D3368914}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5A9F687-E094-4B35-8B48-1955D3368914}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5A9F687-E094-4B35-8B48-1955D3368914}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E74BBD0-C44C-4987-9A7E-391FA6123BA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E74BBD0-C44C-4987-9A7E-391FA6123BA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E74BBD0-C44C-4987-9A7E-391FA6123BA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E74BBD0-C44C-4987-9A7E-391FA6123BA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3F46BEF-FBCD-41B2-A0E2-7819DD0C1486}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3F46BEF-FBCD-41B2-A0E2-7819DD0C1486}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3F46BEF-FBCD-41B2-A0E2-7819DD0C1486}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3F46BEF-FBCD-41B2-A0E2-7819DD0C1486}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA4D7742-9A66-4DB8-8408-8FBA8C60BA3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA4D7742-9A66-4DB8-8408-8FBA8C60BA3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA4D7742-9A66-4DB8-8408-8FBA8C60BA3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA4D7742-9A66-4DB8-8408-8FBA8C60BA3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{593FCBF4-75BA-4F9F-B39F-820F9C3E3F50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{593FCBF4-75BA-4F9F-B39F-820F9C3E3F50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{593FCBF4-75BA-4F9F-B39F-820F9C3E3F50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{593FCBF4-75BA-4F9F-B39F-820F9C3E3F50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FBB6744-846D-4799-BDB3-924883B662F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FBB6744-846D-4799-BDB3-924883B662F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FBB6744-846D-4799-BDB3-924883B662F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FBB6744-846D-4799-BDB3-924883B662F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA3F4886-B5D0-4818-B029-06E1B5808E3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA3F4886-B5D0-4818-B029-06E1B5808E3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA3F4886-B5D0-4818-B029-06E1B5808E3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA3F4886-B5D0-4818-B029-06E1B5808E3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A2954D9-42EE-4E1C-BA4C-54638CE2EC62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A2954D9-42EE-4E1C-BA4C-54638CE2EC62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A2954D9-42EE-4E1C-BA4C-54638CE2EC62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A2954D9-42EE-4E1C-BA4C-54638CE2EC62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F3603F6-E57E-4976-92E9-97BB71DE477A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F3603F6-E57E-4976-92E9-97BB71DE477A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F3603F6-E57E-4976-92E9-97BB71DE477A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F3603F6-E57E-4976-92E9-97BB71DE477A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7956AADD-2F11-4AB4-A417-B209B8510B60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7956AADD-2F11-4AB4-A417-B209B8510B60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7956AADD-2F11-4AB4-A417-B209B8510B60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7956AADD-2F11-4AB4-A417-B209B8510B60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FF3C742-D247-4AED-ACC0-2627AED0F0AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FF3C742-D247-4AED-ACC0-2627AED0F0AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FF3C742-D247-4AED-ACC0-2627AED0F0AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FF3C742-D247-4AED-ACC0-2627AED0F0AA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
