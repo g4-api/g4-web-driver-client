@@ -1,10 +1,8 @@
-﻿using G4.WebDriver.Extensions;
-using G4.WebDriver.Models;
+﻿using G4.WebDriver.Models;
 using G4.WebDriver.Remote.Uia;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using System;
 using System.IO;
 
 namespace G4.WebDriver.Tests
