@@ -2,6 +2,7 @@
 using G4.WebDriver.Extensions;
 using G4.WebDriver.Models;
 using G4.WebDriver.Remote;
+using G4.WebDriver.Remote.Uia;
 
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace G4.WebDriver.Simulator
     /// <summary>
     /// Represents a simulated WebElement for testing or no browser purposes.
     /// </summary>
-    public class SimulatorElement : IWebElement, ILocatable
+    public class SimulatorElement : IWebElement, ILocatable, IUser32Element
     {
         #region *** Fields       ***
         private static readonly Random s_random = new();
@@ -264,19 +265,45 @@ namespace G4.WebDriver.Simulator
         }
 
         /// <inheritdoc />
+        public void MoveToElement()
+        {
+            // No actual action is performed.
+        }
+
+        /// <inheritdoc />
+        public void MoveToElement(MousePositionInputModel positionData)
+        {
+            // No actual action is performed.
+        }
+
+        /// <inheritdoc />
+        public void SendClick()
+        {
+            // No actual action is performed.
+        }
+
+        /// <inheritdoc />
+        public void SendDoubleClick()
+        {
+            // No actual action is performed.
+        }
+
+        /// <inheritdoc />
         public void SendKeys(string text)
         {
             ConfirmActionOnElement(element: this);
             Attributes["value"] = text;
         }
 
+        /// <inheritdoc />
+        public void SetFocus()
+        {
+            // No actual action is performed.
+        }
+
         /// <summary>
         /// Submits the WebElement (mock method - does not perform any action).
         /// </summary>
-        /// <remarks>
-        /// This method is designed to be an instance method, and it is intentionally left as a mock method
-        /// without performing any action. Consider the specific requirements before modifying its behavior.
-        /// </remarks>
         [SuppressMessage(
             category: "Performance",
             checkId: "CA1822:Mark members as static",
@@ -292,10 +319,6 @@ namespace G4.WebDriver.Simulator
         /// Captures a screenshot of the current WebElement.
         /// </summary>
         /// <returns>A <see cref="ScreenshotModel"/> containing the screenshot in Base64 format and its raw byte representation.</returns>
-        /// <remarks>
-        /// This method is designed to be an instance method, and it is intentionally left as a mock method
-        /// without using instance members. Consider the specific requirements before modifying its behavior.
-        /// </remarks>
         public ScreenshotModel GetScreenshot() => new SimulatorScreenshot().GetScreenshot();
 
         // Confirms whether an action can be performed on the WebElement.

@@ -2,6 +2,8 @@
 using G4.WebDriver.Models;
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 
@@ -18,6 +20,29 @@ namespace G4.WebDriver.Remote.Uia
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             PropertyNameCaseInsensitive = true
         };
+
+        /// <inheritdoc />
+        new public IWebElement FindElement(By by)
+        {
+            // Find the element using the base class method
+            var webElement = base.FindElement(by);
+
+            // Return a new UiaElement instance with the found element ID
+            return new UiaElement(Driver, webElement.Id);
+        }
+
+        /// <inheritdoc />
+        new public IEnumerable<IWebElement> FindElements(By by)
+        {
+            // Find the elements using the base class method
+            var elements = base
+                .FindElements(by)
+                .Select(i => (IWebElement)new UiaElement(Driver, i.Id))
+                .ToList();
+
+            // Return a read-only collection of the found elements
+            return new ReadOnlyCollection<IWebElement>(elements);
+        }
 
         /// <inheritdoc />
         new public string GetAttribute(string name)

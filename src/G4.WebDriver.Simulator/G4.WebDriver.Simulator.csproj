@@ -26,6 +26,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\G4.WebDriver.Remote.Appium\G4.WebDriver.Remote.Appium.csproj" />
+		<ProjectReference Include="..\G4.WebDriver.Remote.Uia\G4.WebDriver.Remote.Uia.csproj" />
 		<ProjectReference Include="..\G4.WebDriver\G4.WebDriver.csproj" />
 	</ItemGroup>
 

@@ -192,47 +192,23 @@ namespace G4.WebDriver.Remote.Uia
         /// <inheritdoc />
         new public IWebElement FindElement(By by)
         {
-            // Send a command to the WebDriver to find an element using the specified locator strategy and value.
-            var response = Invoker.Invoke(nameof(WebDriverCommands.FindElement), new
-            {
-                by.Using,  // The method used to locate the element (e.g., CSS selector, XPath).
-                by.Value   // The actual value of the locator (e.g., ".button-class", "//input[@id='submit']").
-            });
+            // Find the element using the base class method
+            var element = base.FindElement(by);
 
-            // Extract the JSON response from the WebDriver command.
-            var value = (JsonElement)response.Value;
-
-            // Convert the JSON response to a dictionary to access the element's details.
-            var element = value.ConvertToDictionary();
-
-            // Get the element ID from the dictionary, which uniquely identifies the element within the current session.
-            var id = element.First().Value.ToString();
-
-            // Return a new WebElement instance, initializing it with the WebDriver instance and the extracted element ID.
-            return new UiaElement(driver: this, id);
+            // Return a new UiaElement instance with the found element ID
+            return new UiaElement(driver: this, id: element.Id);
         }
 
         /// <inheritdoc />
         new public IEnumerable<IWebElement> FindElements(By by)
         {
-            // Send a command to the WebDriver to find all elements that match the specified locator strategy and value.
-            var response = Invoker.Invoke(nameof(WebDriverCommands.FindElements), new
-            {
-                by.Using,  // The method used to locate the elements (e.g., CSS selector, XPath).
-                by.Value   // The actual value of the locator (e.g., ".button-class", "//input[@id='submit']").
-            });
-
-            // Parse the JSON response to an array of elements.
-            var value = ((JsonElement)response.Value).EnumerateArray().ToArray();
-
-            // Convert each element in the array to a dictionary to access its details, 
-            // and create a WebElement instance for each found element.
-            var elements = value
-                .Select(i => i.ConvertToDictionary())
-                .Select(i => new UiaElement(driver: this, id: i.First().Value.ToString()) as IWebElement)
+            // Find the elements using the base class method
+            var elements = base
+                .FindElements(by)
+                .Select(i => (IWebElement)new UiaElement(driver: this, id: i.Id))
                 .ToList();
 
-            // Return a read-only collection of the found WebElement instances.
+            // Return a read-only collection of the found elements
             return new ReadOnlyCollection<IWebElement>(elements);
         }
 

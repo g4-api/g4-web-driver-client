@@ -5,6 +5,7 @@ using G4.WebDriver.Remote;
 using G4.WebDriver.Remote.Appium;
 using G4.WebDriver.Remote.Appium.Models;
 using G4.WebDriver.Remote.Interactions;
+using G4.WebDriver.Remote.Uia;
 
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,8 @@ namespace G4.WebDriver.Simulator
         ITakesScreenshot,
         IWebDriver,
         IGeolocation,
-        IMobileDeviceKeyboard
+        IMobileDeviceKeyboard,
+        IUser32Driver
     {
         #region *** Fields       ***
         [GeneratedRegex("(?<=top:(\\s+)?)\\d+|\\d+(?=\\))")]
@@ -472,6 +474,36 @@ namespace G4.WebDriver.Simulator
         public void HideKeyboard(HideKeyboardModel model)
         {
             // This method is used in a simulator for keyboard hiding simulation.
+            // No actual action is performed.
+        }
+
+        /// <inheritdoc />
+        public void SendInputs(params string[] codes)
+        {
+            // No actual action is performed.
+        }
+
+        /// <inheritdoc />
+        public void SendInputs(int repeat, params string[] codes)
+        {
+            // No actual action is performed.
+        }
+
+        /// <inheritdoc />
+        public void SendKeys(string text)
+        {
+            // No actual action is performed.
+        }
+
+        /// <inheritdoc />
+        public void SendKeys(string text, TimeSpan delay)
+        {
+            // No actual action is performed.
+        }
+
+        /// <inheritdoc />
+        public void SendKeys(int repeat, string text)
+        {
             // No actual action is performed.
         }
 
