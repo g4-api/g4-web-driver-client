@@ -254,6 +254,25 @@ namespace G4.WebDriver.Remote.Uia
         }
 
         /// <summary>
+        /// Sends each character of the specified text as a key input with a delay between each keystroke.
+        /// </summary>
+        /// <param name="text">The text to be sent as key inputs.</param>
+        /// <param name="delay">The delay to wait between sending each key.</param>
+        public void SendKeys(string text, TimeSpan delay)
+        {
+            // Iterate through each character in the provided text.
+            foreach (var character in text)
+            {
+                // Send the current character as a key input.
+                // 'repeat: 1' indicates that the key is sent once.
+                SendKeys(repeat: 1, text: $"{character}");
+
+                // Wait for the specified delay before sending the next key.
+                Thread.Sleep(delay);
+            }
+        }
+
+        /// <summary>
         /// Sends text input to the WebDriver server multiple times.
         /// </summary>
         /// <param name="repeat">The number of times to repeat the input.</param>
