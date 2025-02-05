@@ -1,9 +1,12 @@
 ﻿using G4.WebDriver.Models;
+using G4.WebDriver.Extensions;
 using G4.WebDriver.Remote.Uia;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using System;
 using System.IO;
+using System.Threading;
 
 namespace G4.WebDriver.Tests
 {

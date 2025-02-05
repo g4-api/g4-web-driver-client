@@ -17,6 +17,11 @@ namespace G4.WebDriver.Remote
         IDictionary<string, WebDriverCommandModel> Commands { get; }
 
         /// <summary>
+        /// Gets the address of the WebDriver server.
+        /// </summary>
+        public Uri ServerAddress { get; }
+
+        /// <summary>
         /// Gets the underline WebDriverService instance of the IWebDriverCommandInvoker.
         /// </summary>
         IWebDriverService WebDriverService { get; }

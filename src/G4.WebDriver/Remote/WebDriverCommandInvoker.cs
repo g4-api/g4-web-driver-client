@@ -62,9 +62,6 @@ namespace G4.WebDriver.Remote
             }
         }
 
-        // Gets the address of the WebDriver server.
-        private readonly string _serverAddress;
-
         // Gets the timeout duration for WebDriver commands.
         private readonly TimeSpan _timeout;
 
@@ -198,10 +195,12 @@ namespace G4.WebDriver.Remote
         /// <param name="keepAlive">A value indicating whether to use keep-alive for the WebDriver connection.</param>
         public WebDriverCommandInvoker(Uri serverAddress, HttpClient httpClient, TimeSpan timeout, bool keepAlive)
         {
-            _serverAddress = serverAddress.AbsoluteUri; // The address of the WebDriver server.
-            _timeout = timeout;                         // The timeout duration for WebDriver commands.
-            _keepAlive = keepAlive;                     // value indicating whether to use keep-alive for the WebDriver connection.
-            _httpClient = httpClient;                   // The HttpClient used for WebDriver communication.
+            _timeout = timeout;       // The timeout duration for WebDriver commands.
+            _keepAlive = keepAlive;   // value indicating whether to use keep-alive for the WebDriver connection.
+            _httpClient = httpClient; // The HttpClient used for WebDriver communication.
+
+            // The address of the WebDriver server.
+            ServerAddress = serverAddress;
 
             // Get initial commands from the WebDriverCommands container.
             var initialCommands = GetCommandsFromContainer(typeof(WebDriverCommands));
@@ -229,6 +228,11 @@ namespace G4.WebDriver.Remote
         /// Gets or sets the session ID model associated with the WebDriver command invoker.
         /// </summary>
         public SessionIdModel Session { get; set; }
+
+        /// <summary>
+        /// Gets the address of the WebDriver server.
+        /// </summary>
+        public Uri ServerAddress { get; }
         #endregion
 
         #region *** Methods      ***
@@ -351,14 +355,17 @@ namespace G4.WebDriver.Remote
                 .Replace("$[session]", command.Session)
                 .Replace("$[element]", command.Element);
 
+            // Get the server address and remove trailing slashes
+            var serverAddress = ServerAddress.AbsoluteUri.Trim('/');
+
             // Invoke the CommandInvoking event
-            CommandInvoking?.Invoke(sender: this, e: new(_serverAddress, command));
+            CommandInvoking?.Invoke(sender: this, e: new(serverAddress, command));
 
             // Send the command and get the response
-            var response = command.Send(_httpClient, baseUrl: _serverAddress, _timeout, _keepAlive);
+            var response = command.Send(_httpClient, baseUrl: serverAddress, _timeout, _keepAlive);
 
             // Invoke the CommandInvoked event
-            CommandInvoked?.Invoke(sender: this, e: new(_serverAddress, response));
+            CommandInvoked?.Invoke(sender: this, e: new(serverAddress, response));
 
             // Handle special case for 404 Not Found with no session (NoSuchSessionException)
             if (response.StatusCode == HttpStatusCode.NotFound && string.IsNullOrEmpty(command.Session))

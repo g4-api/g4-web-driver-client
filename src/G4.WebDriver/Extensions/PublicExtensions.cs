@@ -514,7 +514,17 @@ namespace G4.WebDriver.Extensions
         /// </summary>
         /// <param name="driver">The instance of the IWebDriver from which to retrieve the server address.</param>
         /// <returns>The URI representing the server address of the WebDriver service.</returns>
-        public static Uri GetServerAddress(this IWebDriver driver) => driver.Invoker.WebDriverService.ServerAddress;
+        public static Uri GetServerAddress(this IWebDriver driver)
+        {
+            // Get the WebDriver service and server address from the driver instance.
+            var webDriverService = driver.Invoker.WebDriverService;
+            var serverAddress = driver.Invoker.ServerAddress;
+
+            // Return the server address from the WebDriver service if available, or the default server address.
+            return webDriverService == null || webDriverService.ServerAddress == default
+                ? serverAddress
+                : webDriverService.ServerAddress;
+        }
 
         /// <summary>
         /// Retrieves the current session ID associated with the WebDriver instance.

@@ -37,6 +37,11 @@ namespace G4.WebDriver.Simulator
         public IDictionary<string, WebDriverCommandModel> Commands { get; }
 
         /// <summary>
+        /// Gets the address of the WebDriver server.
+        /// </summary>
+        public Uri ServerAddress => new("http://simulator.local.io");
+
+        /// <summary>
         /// Gets or sets the session identifier model.
         /// </summary>
         public SessionIdModel Session { get; set; } = new SessionIdModel
