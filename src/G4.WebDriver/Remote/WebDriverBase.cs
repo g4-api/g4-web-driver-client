@@ -55,7 +55,6 @@ namespace G4.WebDriver.Remote
             AddCustomCommands();
 
             // If a new session is not required, exit the constructor early.
-            
             if (!session.StartNewSession)
             {
                 return;
