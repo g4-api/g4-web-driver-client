@@ -8,13 +8,15 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text;
 using System.Threading;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace G4.WebDriver.Remote.Uia
 {
     /// <summary>
     /// Represents a WebDriver implementation for UI Automation (UIA), extending the <see cref="RemoteWebDriver"/>.
     /// </summary>
-    public class UiaDriver : RemoteWebDriver
+    public class UiaDriver : RemoteWebDriver, IUser32Driver
     {
         #region *** Constructors ***
         /// <summary>
@@ -187,20 +189,60 @@ namespace G4.WebDriver.Remote.Uia
             PropertyNameCaseInsensitive = true
         };
 
-        /// <summary>
-        /// Sends input scan codes to the WebDriver server.
-        /// </summary>
-        /// <param name="codes">The scan codes to send.</param>
+        /// <inheritdoc />
+        new public IWebElement FindElement(By by)
+        {
+            // Send a command to the WebDriver to find an element using the specified locator strategy and value.
+            var response = Invoker.Invoke(nameof(WebDriverCommands.FindElement), new
+            {
+                by.Using,  // The method used to locate the element (e.g., CSS selector, XPath).
+                by.Value   // The actual value of the locator (e.g., ".button-class", "//input[@id='submit']").
+            });
+
+            // Extract the JSON response from the WebDriver command.
+            var value = (JsonElement)response.Value;
+
+            // Convert the JSON response to a dictionary to access the element's details.
+            var element = value.ConvertToDictionary();
+
+            // Get the element ID from the dictionary, which uniquely identifies the element within the current session.
+            var id = element.First().Value.ToString();
+
+            // Return a new WebElement instance, initializing it with the WebDriver instance and the extracted element ID.
+            return new UiaElement(driver: this, id);
+        }
+
+        /// <inheritdoc />
+        new public IEnumerable<IWebElement> FindElements(By by)
+        {
+            // Send a command to the WebDriver to find all elements that match the specified locator strategy and value.
+            var response = Invoker.Invoke(nameof(WebDriverCommands.FindElements), new
+            {
+                by.Using,  // The method used to locate the elements (e.g., CSS selector, XPath).
+                by.Value   // The actual value of the locator (e.g., ".button-class", "//input[@id='submit']").
+            });
+
+            // Parse the JSON response to an array of elements.
+            var value = ((JsonElement)response.Value).EnumerateArray().ToArray();
+
+            // Convert each element in the array to a dictionary to access its details, 
+            // and create a WebElement instance for each found element.
+            var elements = value
+                .Select(i => i.ConvertToDictionary())
+                .Select(i => new UiaElement(driver: this, id: i.First().Value.ToString()) as IWebElement)
+                .ToList();
+
+            // Return a read-only collection of the found WebElement instances.
+            return new ReadOnlyCollection<IWebElement>(elements);
+        }
+
+        /// <inheritdoc />
         public void SendInputs(params string[] codes)
         {
             SendInputs(1, codes);
         }
 
-        /// <summary>
-        /// Sends input scan codes to the WebDriver server multiple times.
-        /// </summary>
-        /// <param name="repeat">The number of times to repeat the input.</param>
-        /// <param name="codes">The scan codes to send.</param>
+        /// <inheritdoc />
         public void SendInputs(int repeat, params string[] codes)
         {
             // Get the session ID from the WebDriver
@@ -244,20 +286,13 @@ namespace G4.WebDriver.Remote.Uia
             }
         }
 
-        /// <summary>
-        /// Sends text input to the WebDriver server.
-        /// </summary>
-        /// <param name="text">The text to send.</param>
+        /// <inheritdoc />
         public void SendKeys(string text)
         {
             SendKeys(repeat: 1, text);
         }
 
-        /// <summary>
-        /// Sends each character of the specified text as a key input with a delay between each keystroke.
-        /// </summary>
-        /// <param name="text">The text to be sent as key inputs.</param>
-        /// <param name="delay">The delay to wait between sending each key.</param>
+        /// <inheritdoc />
         public void SendKeys(string text, TimeSpan delay)
         {
             // Iterate through each character in the provided text.
@@ -272,11 +307,7 @@ namespace G4.WebDriver.Remote.Uia
             }
         }
 
-        /// <summary>
-        /// Sends text input to the WebDriver server multiple times.
-        /// </summary>
-        /// <param name="repeat">The number of times to repeat the input.</param>
-        /// <param name="text">The text to send.</param>
+        /// <inheritdoc />
         public void SendKeys(int repeat, string text)
         {
             // Get the session ID from the WebDriver

@@ -1,16 +1,13 @@
-﻿using G4.WebDriver.Models;
-using G4.WebDriver.Remote;
+﻿using G4.WebDriver.Extensions;
+using G4.WebDriver.Models;
 
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
 
-namespace G4.WebDriver.Extensions
+namespace G4.WebDriver.Remote.Uia
 {
-    /// <summary>
-    /// Provides extension methods for UI automation using WebDriver.
-    /// </summary>
-    public static class UiaExtensions
+    public class UiaElement(IWebDriver driver, string id) : WebElement(driver, id), IUser32Element
     {
         // Initialize the static HttpClient instance for sending requests to the WebDriver server
         private static HttpClient HttpClient => new();
@@ -22,22 +19,14 @@ namespace G4.WebDriver.Extensions
             PropertyNameCaseInsensitive = true
         };
 
-        /// <summary>
-        /// Gets the UI Automation attribute value of a web element.
-        /// </summary>
-        /// <param name="element">The web element to get the attribute from.</param>
-        /// <param name="name">The name of the attribute.</param>
-        /// <returns>The attribute value as a string.</returns>
-        public static string GetUser32Attribute(this IWebElement element, string name)
+        /// <inheritdoc />
+        new public string GetAttribute(string name)
         {
             // Get the session ID and element ID from the web element
-            var (sessionId, elementId) = GetRouteData(element);
-
-            // Get the WebDriver instance from the web element
-            var driver = element.Driver;
+            var (sessionId, elementId) = GetRouteData(this);
 
             // Get the remote server URI from the command executor
-            var url = GetRemoteServerUri(driver);
+            var url = GetRemoteServerUri(Driver);
 
             // Construct the route for the attribute command
             var requestUri = $"{url}/session/{sessionId}/element/{elementId}/attribute/{name}";
@@ -62,33 +51,21 @@ namespace G4.WebDriver.Extensions
             return isValue ? $"{value}" : string.Empty;
         }
 
-        /// <summary>
-        /// Moves the mouse pointer over the specified web element using default mouse position data.
-        /// </summary>
-        /// <param name="element">The target web element over which the mouse will be moved.</param>
-        /// <remarks>This method is designed for Windows environments only, utilizing the user32.dll for native mouse operations.</remarks>
-        public static void MoveUser32Mouse(this IWebElement element)
+        /// <inheritdoc />
+        public void MoveToElement()
         {
             // Call the overload with a default MousePositionInputModel.
-            MoveUser32Mouse(element, new MousePositionInputModel());
+            MoveToElement(new MousePositionInputModel());
         }
 
-        /// <summary>
-        /// Moves the mouse pointer over the specified web element using the provided mouse position data.
-        /// </summary>
-        /// <param name="element">The target web element over which the mouse will be moved.</param>
-        /// <param name="positionData">The mouse position data to use when moving the mouse.</param>
-        /// <remarks>This method is designed for Windows environments only, utilizing the user32.dll for native mouse operations.</remarks>
-        public static void MoveUser32Mouse(this IWebElement element, MousePositionInputModel positionData)
+        /// <inheritdoc />
+        public void MoveToElement(MousePositionInputModel positionData)
         {
             // Retrieve the session ID and element ID from the web element for routing.
-            var (sessionId, elementId) = GetRouteData(element);
-
-            // Retrieve the WebDriver instance associated with the element.
-            var driver = element.Driver;
+            var (sessionId, elementId) = GetRouteData(this);
 
             // Get the URI of the remote server from the command executor.
-            var url = GetRemoteServerUri(driver);
+            var url = GetRemoteServerUri(Driver);
 
             // Construct the request URI for the native mouse move command.
             var requestUri = $"{url}/session/{sessionId}/user32/element/{elementId}/mouse/move";
@@ -112,20 +89,14 @@ namespace G4.WebDriver.Extensions
             response.EnsureSuccessStatusCode();
         }
 
-        /// <summary>
-        /// Sends a native click command to a web element.
-        /// </summary>
-        /// <param name="element">The web element to click.</param>
-        public static void SendUser32Click(this IWebElement element)
+        /// <inheritdoc />
+        public void SendClick()
         {
             // Get the session ID and element ID from the web element
-            var (sessionId, elementId) = GetRouteData(element);
-
-            // Get the WebDriver instance from the web element
-            var driver = element.Driver;
+            var (sessionId, elementId) = GetRouteData(this);
 
             // Get the remote server URI from the command executor
-            var url = GetRemoteServerUri(driver);
+            var url = GetRemoteServerUri(Driver);
 
             // Construct the route for the native click command
             var requestUri = $"{url}/session/{sessionId}/user32/element/{elementId}/click";
@@ -140,20 +111,14 @@ namespace G4.WebDriver.Extensions
             response.EnsureSuccessStatusCode();
         }
 
-        /// <summary>
-        /// Sends a native double-click command to a web element.
-        /// </summary>
-        /// <param name="element">The web element to double-click.</param>
-        public static void SendUser32DoubleClick(this IWebElement element)
+        /// <inheritdoc />
+        public void SendDoubleClick()
         {
             // Get the session ID and element ID from the web element
-            var (sessionId, elementId) = GetRouteData(element);
-
-            // Get the WebDriver instance from the web element
-            var driver = element.Driver;
+            var (sessionId, elementId) = GetRouteData(this);
 
             // Get the remote server URI from the command executor
-            var url = GetRemoteServerUri(driver);
+            var url = GetRemoteServerUri(Driver);
 
             // Construct the route for the native double-click command
             var requestUri = $"{url}/session/{sessionId}/user32/element/{elementId}/dclick";
@@ -168,20 +133,14 @@ namespace G4.WebDriver.Extensions
             response.EnsureSuccessStatusCode();
         }
 
-        /// <summary>
-        /// Sets focus on a web element.
-        /// </summary>
-        /// <param name="element">The web element to set focus on.</param>
-        public static void SetUser32Focus(this IWebElement element)
+        /// <inheritdoc />
+        public void SetFocus()
         {
             // Get the session ID and element ID from the web element
-            var (sessionId, elementId) = GetRouteData(element);
-
-            // Get the WebDriver instance from the web element
-            var driver = element.Driver;
+            var (sessionId, elementId) = GetRouteData(this);
 
             // Get the remote server URI from the command executor
-            var url = GetRemoteServerUri(driver);
+            var url = GetRemoteServerUri(Driver);
 
             // Construct the route for the native focus command
             var requestUri = $"{url}/session/{sessionId}/user32/element/{elementId}/focus";
