@@ -3,6 +3,7 @@ using G4.WebDriver.Remote.Uia;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using System;
 using System.IO;
 
 namespace G4.WebDriver.Tests
@@ -12,6 +13,39 @@ namespace G4.WebDriver.Tests
     [TestCategory("WindowsAppTest")]
     public class UiaDriverTests : TestBase<UiaDriver>
     {
+        [TestMethod]
+        public void Test()
+        {
+            var options = new UiaOptions
+            {
+                App = "notepad.exe"
+            };
+            var driver = new UiaDriver(new Uri("http://localhost:5555/wd/hub"), options);
+            var element = driver.FindElement(By.Xpath("//Document[@Name='Text editor']"));
+            var attribute = element.GetAttribute("Name");
+
+            ((UiaElement)element).MoveToElement();
+            ((UiaElement)element).MoveToElement(new MousePositionInputModel
+            {
+                Alignment = "TopLeft",
+                OffsetX = 100,
+                OffsetY = 100,
+
+            });
+            ((UiaElement)element).MoveToElement(new MousePositionInputModel
+            {
+                Alignment = "TopRight",
+                OffsetX = 100,
+                OffsetY = 100,
+
+            });
+
+            element = driver.FindElement(By.Xpath("//Window[@PartialName='Notepad']//MenuItem[@Name='File']"));
+            ((UiaElement)element).SendClick();
+
+            var b = "";
+        }
+
         [TestMethod(displayName: "Verify that a new application driver can be instantiated and perform UI interactions correctly.")]
         public void NewApplicationDriverTest()
         {

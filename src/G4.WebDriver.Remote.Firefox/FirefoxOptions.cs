@@ -36,7 +36,7 @@ namespace G4.WebDriver.Remote.Firefox
             params LogPreferencesModel[] types)
         {
             // Define the key for storing logging preferences in the options dictionary.
-            var loggingKey = $"log";
+            var loggingKey = "log";
 
             // Create a dictionary to hold the logging configuration.
             var logObject = new Dictionary<string, object>();

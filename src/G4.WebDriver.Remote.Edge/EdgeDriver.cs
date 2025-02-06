@@ -182,7 +182,7 @@ namespace G4.WebDriver.Remote.Edge
         protected override IEnumerable<(string Name, WebDriverCommandModel Command)> GetCustomCommands()
         {
             // Helper method to create a new WebDriverCommandModel with the specified HTTP method and route.
-            static WebDriverCommandModel GetCommand(HttpMethod method, string route) => new()
+            static WebDriverCommandModel NewCommand(HttpMethod method, string route) => new()
             {
                 Method = method,
                 Route = route
@@ -191,13 +191,13 @@ namespace G4.WebDriver.Remote.Edge
             // Return a list of custom commands, each with a unique name and corresponding route.
             return
             [
-                ("InvokeCdp", GetCommand(HttpMethod.Post, "/session/$[session]/ms/cdp/execute")),
-                ("GetSinks", GetCommand(HttpMethod.Get, "/session/$[session]/ms/cast/get_sinks")),
-                ("SetSinkToUse", GetCommand(HttpMethod.Post, "/session/$[session]/ms/cast/set_sink_to_use")),
-                ("StartTabMirroring", GetCommand(HttpMethod.Post, "/session/$[session]/ms/cast/start_tab_mirroring")),
-                ("StartDesktopMirroring", GetCommand(HttpMethod.Post, "/session/$[session]/ms/cast/start_desktop_mirroring")),
-                ("GetIssueMessage", GetCommand(HttpMethod.Get, "/session/$[session]/ms/cast/get_issue_message")),
-                ("StopCasting", GetCommand(HttpMethod.Post, "/session/$[session]/ms/cast/stop_casting"))
+                ("InvokeCdp", NewCommand(HttpMethod.Post, "/session/$[session]/ms/cdp/execute")),
+                ("GetSinks", NewCommand(HttpMethod.Get, "/session/$[session]/ms/cast/get_sinks")),
+                ("SetSinkToUse", NewCommand(HttpMethod.Post, "/session/$[session]/ms/cast/set_sink_to_use")),
+                ("StartTabMirroring", NewCommand(HttpMethod.Post, "/session/$[session]/ms/cast/start_tab_mirroring")),
+                ("StartDesktopMirroring", NewCommand(HttpMethod.Post, "/session/$[session]/ms/cast/start_desktop_mirroring")),
+                ("GetIssueMessage", NewCommand(HttpMethod.Get, "/session/$[session]/ms/cast/get_issue_message")),
+                ("StopCasting", NewCommand(HttpMethod.Post, "/session/$[session]/ms/cast/stop_casting"))
             ];
         }
         #endregion

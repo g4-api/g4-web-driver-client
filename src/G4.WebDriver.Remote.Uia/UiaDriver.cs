@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
-using System.Text.Json;
-using System.Text;
 using System.Threading;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -179,15 +177,30 @@ namespace G4.WebDriver.Remote.Uia
         #endregion
 
         #region *** Methods      ***
-        // Initialize the static HttpClient instance for sending requests to the WebDriver server
-        private static HttpClient HttpClient => new();
-
-        // Initialize the static JsonSerializerOptions instance for deserializing JSON responses
-        private static JsonSerializerOptions JsonSerializerOptions => new()
+        /// <inheritdoc />
+        protected override IEnumerable<(string Name, WebDriverCommandModel Command)> GetCustomCommands()
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            PropertyNameCaseInsensitive = true
-        };
+            // Helper method to create a new WebDriverCommandModel with the specified HTTP method and route.
+            static WebDriverCommandModel NewCommand(HttpMethod method, string route) => new()
+            {
+                Method = method,
+                Route = route
+            };
+
+            // Return a list of custom commands, each with a unique name and corresponding route.
+            return
+            [
+                // Element
+                ("GetUser32Attribute", NewCommand(HttpMethod.Get, "/session/$[session]/element/$[element]/attribute/$[attributeName]")),
+                ("MoveUser32MouseToElement", NewCommand(HttpMethod.Post, "/session/$[session]/user32/element/$[element]/mouse/move")),
+                ("SendUser32ClickToElement", NewCommand(HttpMethod.Post, "/session/$[session]/user32/element/$[element]/click")),
+                ("SendUser32DoubleClickToElement", NewCommand(HttpMethod.Post, "/session/$[session]/user32/element/$[element]/dclick")),
+                ("SetUser32Focus", NewCommand(HttpMethod.Get, "/session/$[session]/user32/element/$[element]/focus")),
+                // Session
+                ("SendUser32Inputs", NewCommand(HttpMethod.Post, "/session/$[session]/user32/inputs")),
+                ("SendUser32Keys", NewCommand(HttpMethod.Post, "/session/$[session]/user32/value"))
+            ];
+        }
 
         /// <inheritdoc />
         new public IWebElement FindElement(By by)
@@ -221,41 +234,19 @@ namespace G4.WebDriver.Remote.Uia
         /// <inheritdoc />
         public void SendInputs(int repeat, params string[] codes)
         {
-            // Get the session ID from the WebDriver
-            var sessionId = $"{Session}";
-
-            // Get the remote server URI from the command executor
-            var url = GetRemoteServerUri(driver: this);
-
-            // Construct the route for the input simulation command
-            var requestUri = $"{url}/session/{sessionId}/user32/inputs";
-
-            // Create the request body with the scan codes to send to the server for input simulation
-            var requestBody = new ScanCodesInputModel
+            // Prepare the WebDriver command for sending scan codes to the server for input simulation
+            var command = Invoker.Commands["SendUser32Inputs"];
+            command.Session = Session.OpaqueKey;
+            command.Data = new ScanCodesInputModel
             {
                 ScanCodes = codes
             };
 
-            // Send the HTTP request and ensure the response is successful for the specified number of repeats
+            // Send the scan codes to the server for the specified number of repeats
             for (var i = 0; i < repeat; i++)
             {
-                // Create the HTTP content for the request body
-                var content = new StringContent(
-                    content: JsonSerializer.Serialize(requestBody, JsonSerializerOptions),
-                    encoding: Encoding.UTF8,
-                    mediaType: "application/json");
-
-                // Create the HTTP request for the input simulation
-                var request = new HttpRequestMessage(HttpMethod.Post, requestUri)
-                {
-                    Content = content
-                };
-
-                // Send the HTTP request
-                var response = HttpClient.Send(request);
-
-                // Ensure the response is successful
-                response.EnsureSuccessStatusCode();
+                // Invoke the SendUser32Inputs WebDriver command
+                Invoker.Invoke(command);
 
                 // Wait for a short interval before sending the next input
                 Thread.Sleep(100);
@@ -286,52 +277,23 @@ namespace G4.WebDriver.Remote.Uia
         /// <inheritdoc />
         public void SendKeys(int repeat, string text)
         {
-            // Get the session ID from the WebDriver
-            var sessionId = $"{Session}";
-
-            // Get the remote server URI from the command executor
-            var url = GetRemoteServerUri(driver: this);
-
-            // Construct the route for the text input command
-            var requestUri = $"{url}/session/{sessionId}/user32/value";
-
-            // Create the request body with the text to send to the server for input simulation
-            var requestBody = new TextInputModel
+            // Prepare the WebDriver command for sending text input to the server for input simulation
+            var command = Invoker.Commands["SendUser32Keys"];
+            command.Session = Session.OpaqueKey;
+            command.Data = new TextInputModel
             {
                 Text = text
             };
 
-            // Send the HTTP request and ensure the response is successful for the specified number of repeats
+            // Send the text to the server for the specified number of repeats
             for (var i = 0; i < repeat; i++)
             {
-                // Create the HTTP content for the request body
-                var content = new StringContent(
-                    content: JsonSerializer.Serialize(requestBody, JsonSerializerOptions),
-                    encoding: Encoding.UTF8,
-                    mediaType: "application/json");
-
-                // Create the HTTP request for the text input
-                var request = new HttpRequestMessage(HttpMethod.Post, requestUri)
-                {
-                    Content = content
-                };
-
-                // Send the HTTP request
-                var response = HttpClient.Send(request);
-
-                // Ensure the response is successful
-                response.EnsureSuccessStatusCode();
+                // Invoke the SendUser32Keys WebDriver command
+                Invoker.Invoke(command);
 
                 // Wait for a short interval before sending the next input
                 Thread.Sleep(100);
             }
-        }
-
-        // Gets the remote server URI from the WebDriver command executor.
-        private static string GetRemoteServerUri(IWebDriver driver)
-        {
-            // Get the remote server URI from the command executor using reflection
-            return driver.GetServerAddress().AbsoluteUri.Trim('/');
         }
 
         /// <summary>

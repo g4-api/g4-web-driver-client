@@ -10,9 +10,9 @@ namespace G4.WebDriver.Remote.Uia
         /// <summary>
         /// Gets the UI Automation attribute value of a web element.
         /// </summary>
-        /// <param name="name">The name of the attribute.</param>
+        /// <param name="attributeName">The name of the attribute.</param>
         /// <returns>The attribute value as a string.</returns>
-        string GetAttribute(string name);
+        string GetAttribute(string attributeName);
 
         /// <summary>
         /// Moves the mouse pointer over the specified web element using default mouse position data.

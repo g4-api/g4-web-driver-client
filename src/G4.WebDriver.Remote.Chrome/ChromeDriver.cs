@@ -175,7 +175,7 @@ namespace G4.WebDriver.Remote.Chrome
         protected override IEnumerable<(string Name, WebDriverCommandModel Command)> GetCustomCommands()
         {
             // Helper method to create a new WebDriverCommandModel with the specified HTTP method and route.
-            static WebDriverCommandModel GetCommand(HttpMethod method, string route) => new()
+            static WebDriverCommandModel NewCommand(HttpMethod method, string route) => new()
             {
                 Method = method,
                 Route = route
@@ -184,12 +184,12 @@ namespace G4.WebDriver.Remote.Chrome
             // Return a list of custom commands, each with a unique name and corresponding route.
             return
             [
-                ("InvokeCdp", GetCommand(HttpMethod.Post, "/session/$[session]/goog/cdp/execute")),
-                ("GetSinks", GetCommand(HttpMethod.Get, "/session/$[session]/goog/cast/get_sinks")),
-                ("SetSinkToUse", GetCommand(HttpMethod.Post, "/session/$[session]/goog/cast/set_sink_to_use")),
-                ("StartTabMirroring", GetCommand(HttpMethod.Post, "/session/$[session]/goog/cast/start_tab_mirroring")),
-                ("GetIssueMessage", GetCommand(HttpMethod.Get, "/session/$[session]/goog/cast/get_issue_message")),
-                ("StopCasting", GetCommand(HttpMethod.Post, "/session/$[session]/goog/cast/stop_casting"))
+                ("InvokeCdp", NewCommand(HttpMethod.Post, "/session/$[session]/goog/cdp/execute")),
+                ("GetSinks", NewCommand(HttpMethod.Get, "/session/$[session]/goog/cast/get_sinks")),
+                ("SetSinkToUse", NewCommand(HttpMethod.Post, "/session/$[session]/goog/cast/set_sink_to_use")),
+                ("StartTabMirroring", NewCommand(HttpMethod.Post, "/session/$[session]/goog/cast/start_tab_mirroring")),
+                ("GetIssueMessage", NewCommand(HttpMethod.Get, "/session/$[session]/goog/cast/get_issue_message")),
+                ("StopCasting", NewCommand(HttpMethod.Post, "/session/$[session]/goog/cast/stop_casting"))
             ];
         }
         #endregion
