@@ -21,8 +21,8 @@ namespace G4.WebDriver.Models
             // Initialize the Capabilities model.
             Capabilities = new CapabilitiesModel();
 
-            // Initialize the DesiredCapabilities dictionary with case-insensitive string keys.
-            DesiredCapabilities = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            // Initialize the FirstMatch dictionary with case-insensitive string keys.
+            FirstMatch = [];
 
             // Set the StartNewSession flag to true by default.
             StartNewSession = true;
@@ -36,10 +36,9 @@ namespace G4.WebDriver.Models
         public CapabilitiesModel Capabilities { get; set; }
 
         /// <summary>
-        /// Gets or sets the desired capabilities that specify the desired features for the WebDriver session.
-        /// These capabilities define what the WebDriver session should support.
+        /// Gets or sets a collection of capabilities that at least one must be matched.
         /// </summary>
-        public IDictionary<string, object> DesiredCapabilities { get; set; }
+        public IEnumerable<IDictionary<string, object>> FirstMatch { get; set; }
 
         /// <summary>
         /// Gets or sets the password needed for intermediary node authentication.
@@ -59,34 +58,6 @@ namespace G4.WebDriver.Models
         /// This is used in conjunction with the Password property for node authentication.
         /// </summary>
         public string User { get; set; }
-        #endregion
-
-        #region *** Methods      ***
-        /// <summary>
-        /// Builds the session model by merging the capabilities into the desired capabilities.
-        /// Merges both FirstMatch and AlwaysMatch capabilities into the DesiredCapabilities dictionary.
-        /// </summary>
-        /// <returns>Returns the current <see cref="SessionModel"/> instance with updated desired capabilities.</returns>
-        public SessionModel Build()
-        {
-            // Merge capabilities from the FirstMatch list into DesiredCapabilities.
-            for (int i = 0; i < Capabilities.FirstMatch.Count(); i++)
-            {
-                foreach (var item in Capabilities.FirstMatch.ElementAt(i))
-                {
-                    DesiredCapabilities[item.Key] = item.Value;
-                }
-            }
-
-            // Merge capabilities from the AlwaysMatch dictionary into DesiredCapabilities.
-            foreach (var item in Capabilities.AlwaysMatch)
-            {
-                DesiredCapabilities[item.Key] = item.Value;
-            }
-
-            // Return the updated session model instance.
-            return this;
-        }
         #endregion
     }
 }

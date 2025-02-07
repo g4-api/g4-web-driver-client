@@ -16,7 +16,6 @@ namespace G4.WebDriver.Models
         public CapabilitiesModel()
         {
             AlwaysMatch = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-            FirstMatch = [];
         }
         #endregion
 
@@ -25,11 +24,6 @@ namespace G4.WebDriver.Models
         /// Gets or sets a collection of capabilities that must all be matched.
         /// </summary>
         public IDictionary<string, object> AlwaysMatch { get; set; }
-
-        /// <summary>
-        /// Gets or sets a collection of capabilities that at least one must be matched.
-        /// </summary>
-        public IEnumerable<IDictionary<string, object>> FirstMatch { get; set; }
         #endregion
     }
 }

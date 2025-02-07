@@ -17,6 +17,7 @@ namespace G4.WebDriver.Remote.Uia
         public UiaOptions()
         {
             UiaOptionsDictionary = [];
+            BrowserName = "Uia";
         }
         #endregion
 

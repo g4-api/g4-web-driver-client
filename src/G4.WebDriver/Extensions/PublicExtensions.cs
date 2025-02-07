@@ -845,44 +845,20 @@ namespace G4.WebDriver.Extensions
         {
             // Initialize the desired capabilities dictionary.
             var desired = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            var firstMatch = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
             // Populate the desired capabilities from AlwaysMatch.
             foreach (var capability in model.AlwaysMatch)
             {
                 desired[capability.Key] = capability.Value;
-            }
-
-            // Populate the desired capabilities from FirstMatch.
-            foreach (var capabilities in model.FirstMatch)
-            {
-                foreach (var capability in capabilities)
-                {
-                    desired[capability.Key] = capability.Value;
-                }
-            }
-
-            // If FirstMatch is empty, move the 'browserName' entry to FirstMatch.
-            if (model.FirstMatch?.Any() == false)
-            {
-                const string BrowserName = "browserName";
-                _ = desired.TryGetValue(BrowserName, out object browserNameOut);
-
-                // Create a new entry for FirstMatch.
-                var entry = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-                {
-                    [BrowserName] = $"{browserNameOut}"
-                };
-
-                // Add the entry to FirstMatch and remove it from AlwaysMatch.
-                model.FirstMatch = model.FirstMatch.Concat([entry]);
-                model.AlwaysMatch.Remove(BrowserName);
+                firstMatch[capability.Key] = capability.Value;
             }
 
             // Return a new SessionModel instance.
             return new SessionModel
             {
                 Capabilities = model,
-                DesiredCapabilities = desired
+                FirstMatch = [firstMatch]
             };
         }
 
