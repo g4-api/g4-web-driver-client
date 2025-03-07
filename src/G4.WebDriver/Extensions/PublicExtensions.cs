@@ -516,14 +516,7 @@ namespace G4.WebDriver.Extensions
         /// <returns>The URI representing the server address of the WebDriver service.</returns>
         public static Uri GetServerAddress(this IWebDriver driver)
         {
-            // Get the WebDriver service and server address from the driver instance.
-            var webDriverService = driver.Invoker.WebDriverService;
-            var serverAddress = driver.Invoker.ServerAddress;
-
-            // Return the server address from the WebDriver service if available, or the default server address.
-            return webDriverService == null || webDriverService.ServerAddress == default
-                ? serverAddress
-                : webDriverService.ServerAddress;
+            return ResolveServerAddress(driver);
         }
 
         /// <summary>
@@ -946,7 +939,7 @@ namespace G4.WebDriver.Extensions
         public static void SendCommand(this IWebDriver driver, WebDriverCommandModel command)
         {
             // Retrieve the server address from the WebDriver service.
-            var serverAddress = driver.Invoker.WebDriverService.ServerAddress.AbsoluteUri;
+            var serverAddress = ResolveServerAddress(driver).AbsoluteUri;
 
             // Send the command to the WebDriver server.
             command.Send(baseUrl: serverAddress);
@@ -1382,7 +1375,7 @@ namespace G4.WebDriver.Extensions
         private static string FormatCommandRoute(IWebDriver driver, string route)
         {
             // Retrieve the server address from the WebDriver service.
-            var serverAddress = driver.Invoker.WebDriverService.ServerAddress.AbsoluteUri;
+            var serverAddress = ResolveServerAddress(driver).AbsoluteUri;
 
             // Check if the driver implements IHasSessionId to confirm it has a session ID.
             if (driver is not IWebDriverSession)
@@ -1556,6 +1549,25 @@ namespace G4.WebDriver.Extensions
             return isArguments
                 ? (IEnumerable<string>)arguments
                 : [];
+        }
+
+        // Resolves the server address of the WebDriver service associated with the given driver instance.
+        public static Uri ResolveServerAddress(IWebDriver driver)
+        {
+            // Get the WebDriver service and server address from the driver instance.
+            var webDriverService = driver.Invoker?.WebDriverService;
+            var serverAddress = driver.Invoker?.ServerAddress;
+
+            // Check if the WebDriver invoker is null. If so, throw an exception.
+            if (driver.Invoker == null)
+            {
+                throw new WebDriverException("The WebDriver invoker cannot be null.");
+            }
+
+            // Return the server address from the WebDriver service if available, or the default server address.
+            return webDriverService == null || webDriverService.ServerAddress == default
+                ? serverAddress
+                : webDriverService.ServerAddress;
         }
     }
 }
