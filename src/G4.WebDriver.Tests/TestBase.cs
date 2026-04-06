@@ -2,7 +2,6 @@
 using G4.WebDriver.Remote;
 using G4.WebDriver.Remote.Edge;
 using G4.WebDriver.Remote.Uia;
-using G4.WebDriver.Tests.Extensions;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -88,7 +87,7 @@ namespace G4.WebDriver.Tests
         private static IWebDriver NewDriver(TestContext context, WebDriverOptionsBase options, string driverBinaries)
         {
             // Determine the build name based on the "Build.Name" property.
-            var buildName = context.Properties.Get(key: "Build.Name", defaultValue: string.Empty);
+            var buildName = context.Properties.TryGetValue("Build.Name", out var build) ? build.ToString() : string.Empty;
             buildName = string.IsNullOrEmpty(buildName)
                 ? $"Development.{DateTime.UtcNow:yyyy.MM.dd}"
                 : buildName;
@@ -103,8 +102,8 @@ namespace G4.WebDriver.Tests
                     //["username"] = $"{context.Properties["BrowserStack.Username"]}",
                     //["accessKey"] = $"{context.Properties["BrowserStack.Password"]}",
                     ["browserVersion"] = "latest",
-                   // ["osVersion"] = "11",
-                   // ["os"] = "Windows",
+                    // ["osVersion"] = "11",
+                    // ["os"] = "Windows",
                     ["local"] = "true",
                     ["sessionName"] = GetTestName(),
                     ["buildName"] = buildName,

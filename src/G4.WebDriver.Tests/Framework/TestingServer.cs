@@ -1,16 +1,13 @@
-﻿using Microsoft.AspNetCore;
+﻿#pragma warning disable CA1822, S2325, CA1873 // Mark members as static
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using System;
-using System.IO;
-using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -55,6 +52,7 @@ namespace G4.WebDriver.Tests.Framework
     /// <summary>
     /// Represents the startup configuration for the application.
     /// </summary>
+    /// <remarks>Initializes a new instance of the <see cref="Startup"/> class.</remarks>
     /// <param name="configuration">The configuration for the application.</param>
     public class Startup(IConfiguration configuration)
     {
@@ -120,13 +118,6 @@ namespace G4.WebDriver.Tests.Framework
                 // Set the route prefix for the Swagger UI
                 options.RoutePrefix = string.Empty;
             });
-
-            // Serve static files from the "Pages" directory at the "/test" endpoint
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Environment.CurrentDirectory, "Pages")),
-                RequestPath = "/test/static"
-            });
         }
     }
 
@@ -136,7 +127,7 @@ namespace G4.WebDriver.Tests.Framework
     public static class WebServer
     {
         // Static variable to hold the web host instance.
-        private static IWebHost s_webHost = NewWebHost(port: 9002, shutdownTimeout: TimeSpan.FromSeconds(60));
+        private static IHost s_webHost = NewWebHost(port: 9002, shutdownTimeout: TimeSpan.FromSeconds(60));
 
         /// <summary>
         /// Starts the web host asynchronously.
@@ -150,14 +141,16 @@ namespace G4.WebDriver.Tests.Framework
             => s_webHost = NewWebHost(port: 9002, shutdownTimeout: TimeSpan.FromSeconds(60));
 
         // Creates a new web host with the specified port and shutdown timeout.
-        private static IWebHost NewWebHost(int port, TimeSpan shutdownTimeout)
+        private static IHost NewWebHost(int port, TimeSpan shutdownTimeout)
         {
-            return WebHost
+            return Host
                 .CreateDefaultBuilder()
-                .UseUrls()
-                .ConfigureKestrel(i => i.Listen(IPAddress.Any, port))
-                .UseStartup<Startup>()
-                .UseShutdownTimeout(shutdownTimeout)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseKestrel(options => options.ListenAnyIP(port));
+                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseShutdownTimeout(shutdownTimeout);
+                })
                 .Build();
         }
 
