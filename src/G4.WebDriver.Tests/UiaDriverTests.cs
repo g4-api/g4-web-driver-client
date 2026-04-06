@@ -3,7 +3,6 @@ using G4.WebDriver.Remote.Uia;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using System;
 using System.IO;
 
 namespace G4.WebDriver.Tests
@@ -13,7 +12,7 @@ namespace G4.WebDriver.Tests
     [TestCategory("WindowsAppTest")]
     public class UiaDriverTests : TestBase<UiaDriver>
     {
-        [TestMethod(displayName: "Verify that a new application driver can be instantiated and perform UI interactions correctly.")]
+        [TestMethod(DisplayName = "Verify that a new application driver can be instantiated and perform UI interactions correctly.")]
         public void NewApplicationDriverTest()
         {
             // Retrieve the local Grid endpoint path from the test context properties
@@ -55,7 +54,7 @@ namespace G4.WebDriver.Tests
             );
         }
 
-        [TestMethod(displayName: "Verify that a new UiaDriver can be instantiated and is not ready by default.")]
+        [TestMethod(DisplayName = "Verify that a new UiaDriver can be instantiated and is not ready by default.")]
         public void NewDesktopDriverTest()
         {
             // Retrieve the local Grid endpoint path from the test context properties

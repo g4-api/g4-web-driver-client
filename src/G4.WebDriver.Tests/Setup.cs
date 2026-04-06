@@ -3,7 +3,6 @@
  * 
  * RESOURCES
  */
-using G4.WebDriver.Tests.Extensions;
 using G4.WebDriver.Tests.Framework;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -25,7 +24,7 @@ namespace G4.WebDriver.Tests
         /// <summary>
         /// Prevents a default instance of the <see cref="Setup"/> class from being created.
         /// </summary>
-        protected Setup()
+        public Setup()
         { }
 
         /// <summary>
@@ -42,8 +41,8 @@ namespace G4.WebDriver.Tests
             WebServer.StartWebHost();  // Start the web host
 
             // Start BrowserStack local agent if the grid endpoint contains "browserstack"
-            var remoteEndpoint = context.Properties.Get(key: "Grid.Endpoint", defaultValue: string.Empty);
-            var isLocal = context.Properties.Get(key: "Integration.Local", defaultValue: "true");
+            var remoteEndpoint = context.Properties.TryGetValue("Grid.Endpoint", out var endpoint) ? endpoint.ToString() : string.Empty;
+            var isLocal = context.Properties.TryGetValue("Integration.Local", out var local) ? local.ToString() : "true";
             if (remoteEndpoint.Contains("browserstack", StringComparison.OrdinalIgnoreCase) && isLocal == "false")
             {
                 // Start the BrowserStack local agent process

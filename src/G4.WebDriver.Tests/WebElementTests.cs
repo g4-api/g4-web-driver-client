@@ -20,7 +20,7 @@ namespace G4.WebDriver.Tests
     public class WebElementTests : TestBase<EdgeDriver>
     {
         #region *** Element: Find       ***
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementFind.html", "ButtonInput")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void FindElementByIdTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -29,10 +29,10 @@ namespace G4.WebDriver.Tests
             var element = driver.FindElement(By.Custom.Id(value));
 
             // assert
-            Assert.IsTrue(!string.IsNullOrEmpty(element?.Id));
+            Assert.IsFalse(string.IsNullOrEmpty(element?.Id));
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementFind.html", "ContainerName")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void FindElementByNameTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -41,10 +41,10 @@ namespace G4.WebDriver.Tests
             var element = driver.FindElement(By.Custom.Name(value));
 
             // assert
-            Assert.IsTrue(!string.IsNullOrEmpty(element?.Id));
+            Assert.IsFalse(string.IsNullOrEmpty(element?.Id));
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementFind.html", "container_class")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void FindElementByClassNameTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -53,10 +53,10 @@ namespace G4.WebDriver.Tests
             var element = driver.FindElement(By.Custom.PartialClassName(value));
 
             // assert
-            Assert.IsTrue(!string.IsNullOrEmpty(element?.Id));
+            Assert.IsFalse(string.IsNullOrEmpty(element?.Id));
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementFind.html", "div")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void FindElementByTagNameTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -65,10 +65,10 @@ namespace G4.WebDriver.Tests
             var element = driver.FindElement(By.TagName(value));
 
             // assert
-            Assert.IsTrue(!string.IsNullOrEmpty(element?.Id));
+            Assert.IsFalse(string.IsNullOrEmpty(element?.Id));
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementFind.html", "#container")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void FindElementByCssTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -77,10 +77,10 @@ namespace G4.WebDriver.Tests
             var element = driver.FindElement(By.CssSelector(value));
 
             // assert
-            Assert.IsTrue(!string.IsNullOrEmpty(element?.Id));
+            Assert.IsFalse(string.IsNullOrEmpty(element?.Id));
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementFind.html", "//div[@id='container']")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void FindElementByXpathTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -89,10 +89,10 @@ namespace G4.WebDriver.Tests
             var element = driver.FindElement(By.Xpath(value));
 
             // assert
-            Assert.IsTrue(!string.IsNullOrEmpty(element?.Id));
+            Assert.IsFalse(string.IsNullOrEmpty(element?.Id));
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementFind.html", "Lorem ipsum dolor")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void FindElementByLinkTextTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -101,17 +101,21 @@ namespace G4.WebDriver.Tests
             var element = driver.FindElement(By.LinkText(value));
 
             // assert
-            Assert.IsTrue(!string.IsNullOrEmpty(element?.Id));
+            Assert.IsFalse(string.IsNullOrEmpty(element?.Id));
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementFind.html", "Lorem ipsum")]
-        [ExpectedException(typeof(NoSuchElementException))]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void FindElementByLinkTextNegativeTest(string url, string value)
-            => Invoke(TestContext, url, (driver) => driver.FindElement(By.LinkText(value)));
+        {
+            Assert.Throws<NoSuchElementException>(
+                action: () => Invoke(TestContext, url, (driver) => driver.FindElement(By.LinkText(value))),
+                message: $"Expected to throw {nameof(NoSuchElementException)} when no element is found with the specified link text."
+            );
+        }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementFind.html", "Lorem ipsum dolor")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void FindElementByPartialLinkTextTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -120,19 +124,23 @@ namespace G4.WebDriver.Tests
             var element = driver.FindElement(By.PartialLinkText(value));
 
             // assert
-            Assert.IsTrue(!string.IsNullOrEmpty(element?.Id));
+            Assert.IsFalse(string.IsNullOrEmpty(element?.Id));
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementFind.html", "q")]
-        [ExpectedException(typeof(NoSuchElementException))]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void FindElementNoSuchElementTest(string url, string value)
-            => Invoke(TestContext, url, (driver) => driver.FindElement(By.Custom.Name(value)));
+        {
+            Assert.Throws<NoSuchElementException>(
+                action: () => Invoke(TestContext, url, (driver) => driver.FindElement(By.Custom.Name(value))),
+                message: $"Expected to throw {nameof(NoSuchElementException)} when no element is found with the specified criteria."
+            );
+        }
         #endregion
 
         #region *** Element: Properties ***
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementPropertiesAndAttributes.html", "TextInput")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void GetTagNameTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -141,11 +149,11 @@ namespace G4.WebDriver.Tests
             var element = driver.FindElement(By.Custom.Id(value));
 
             // assert
-            Assert.IsTrue(!string.IsNullOrEmpty(element?.Id));
+            Assert.IsFalse(string.IsNullOrEmpty(element?.Id));
             Assert.IsTrue(element.TagName.Equals("INPUT", StringComparison.OrdinalIgnoreCase));
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementPropertiesAndAttributes.html", "TextDiv")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void GetTextTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -154,10 +162,10 @@ namespace G4.WebDriver.Tests
             var elements = driver.FindElement(By.Custom.Id(value));
 
             // assert
-            Assert.IsTrue(elements.Text.Length > 0);
+            Assert.IsGreaterThan(0, elements.Text.Length);
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementPropertiesAndAttributes.html", "CheckboxEnabled", true)]
         [DataRow("ElementPropertiesAndAttributes.html", "CheckboxDisabled", false)]
         [TestCategory("Sanity"), TestCategory("Integration")]
@@ -167,10 +175,10 @@ namespace G4.WebDriver.Tests
             var elements = driver.FindElement(By.Custom.Id(value));
 
             // assert
-            Assert.IsTrue(elements.Enabled == expected);
+            Assert.AreEqual(expected, elements.Enabled);
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementPropertiesAndAttributes.html", "CheckboxEnabled", true)]
         [DataRow("ElementPropertiesAndAttributes.html", "CheckboxDisabled", false)]
         [TestCategory("Sanity"), TestCategory("Integration")]
@@ -180,10 +188,10 @@ namespace G4.WebDriver.Tests
             var elements = driver.FindElement(By.Custom.Id(value));
 
             // assert
-            Assert.IsTrue(elements.Selected == expected);
+            Assert.AreEqual(expected, elements.Selected);
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementTextInput.html", "TextAreaEnabled")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void ElementRectTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -193,13 +201,13 @@ namespace G4.WebDriver.Tests
             var rect = element.Rect;
 
             // assert
-            Assert.IsTrue(rect.Height > 0);
-            Assert.IsTrue(rect.Width > 0);
-            Assert.IsTrue(rect.X > 0);
-            Assert.IsTrue(rect.Y > 0);
+            Assert.IsGreaterThan(0, (double)rect.Height);
+            Assert.IsGreaterThan(0, (double)rect.Width);
+            Assert.IsGreaterThan(0, (double)rect.X);
+            Assert.IsGreaterThan(0, (double)rect.Y);
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementTextInput.html", "TextAreaEnabled")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void ElementDisplayedTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -211,7 +219,7 @@ namespace G4.WebDriver.Tests
             Assert.IsTrue(element.Displayed);
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementTextInput.html", "InputHidden")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void ElementDisplayedNegativeTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -225,7 +233,7 @@ namespace G4.WebDriver.Tests
         #endregion
 
         #region *** Element: Actions    ***
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementTextInput.html", "InputEnabledWithText")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void ClearElementTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -241,14 +249,18 @@ namespace G4.WebDriver.Tests
             Assert.IsTrue(string.IsNullOrEmpty(actual));
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementTextInput.html", "UrlDivText")]
-        [ExpectedException(typeof(InvalidElementStateException))]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void ClearElementExceptionTest(string url, string value)
-            => Invoke(TestContext, url, (driver) => driver.FindElement(By.Custom.Id(value)).Clear());
+        {
+            Assert.Throws<InvalidElementStateException>(
+                action: () => Invoke(TestContext, url, (driver) => driver.FindElement(By.Custom.Id(value)).Clear()),
+                message: $"Expected to throw {nameof(InvalidElementStateException)} when trying to clear an element that cannot be cleared."
+            );
+        }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementInteractions.html", "ClickButton")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void ClickElementTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -264,7 +276,7 @@ namespace G4.WebDriver.Tests
             Assert.IsTrue(actual.Equals("click on element", StringComparison.OrdinalIgnoreCase));
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementFind.html")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void FindElementFromElementTest(string url) => Invoke(TestContext, url, (driver) =>
@@ -273,7 +285,7 @@ namespace G4.WebDriver.Tests
             var container = driver.FindElement(By.Custom.Id("container"));
 
             // assert
-            Assert.IsTrue(container.Id.Length > 0);
+            Assert.IsGreaterThan(0, container.Id.Length);
 
             // invoke
             var element = container.FindElement(By.Xpath(".//input"));
@@ -282,7 +294,7 @@ namespace G4.WebDriver.Tests
             Assert.IsFalse(element.Id.Equals(container.Id, StringComparison.OrdinalIgnoreCase));
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementFind.html")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void FindElementsFromElementTest(string url) => Invoke(TestContext, url, (driver) =>
@@ -291,16 +303,16 @@ namespace G4.WebDriver.Tests
             var container = driver.FindElement(By.Custom.Id("container"));
 
             // assert
-            Assert.IsTrue(container.Id.Length > 0);
+            Assert.IsGreaterThan(0, container.Id.Length);
 
             // invoke
             var elements = container.FindElements(By.Xpath(".//input"));
 
             // assert
-            Assert.IsTrue(elements.Count() > 1);
+            Assert.IsGreaterThan(1, elements.Count());
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementPropertiesAndAttributes.html", "TextInput")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void GetAttributeTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -315,7 +327,7 @@ namespace G4.WebDriver.Tests
             Assert.AreEqual(value, attribute);
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementPropertiesAndAttributes.html", "TextInput")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void GetAttributeNullTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -327,10 +339,10 @@ namespace G4.WebDriver.Tests
             var attribute = element.GetAttribute("no such attribute");
 
             // assert
-            Assert.AreEqual(null, attribute);
+            Assert.IsNull(attribute);
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementPropertiesAndAttributes.html", "TextInput")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void GetCssValueTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -345,7 +357,7 @@ namespace G4.WebDriver.Tests
             Assert.AreEqual("400", propertyValue);
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementPropertiesAndAttributes.html", "TextInput")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void GetCssValueEmptyTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -360,7 +372,7 @@ namespace G4.WebDriver.Tests
             Assert.AreEqual(string.Empty, propertyValue);
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementPropertiesAndAttributes.html", "TextInput")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void GetPropertyTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -375,7 +387,7 @@ namespace G4.WebDriver.Tests
             Assert.AreEqual("text", propertyValue);
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementPropertiesAndAttributes.html", "TextInput")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void GetPropertyNullTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -390,7 +402,7 @@ namespace G4.WebDriver.Tests
             Assert.IsNull(propertyValue);
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementTextInput.html", "InputEnabled")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void SendKeysTest(string url, string value) => Invoke(TestContext, url, (driver) =>
@@ -410,7 +422,7 @@ namespace G4.WebDriver.Tests
             Assert.AreEqual("Lorem ipsum dolor", propertyValue);
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementShadowRoot.html")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void GetShadowRootTest(string url) => Invoke(TestContext, url, (driver) =>
@@ -423,7 +435,7 @@ namespace G4.WebDriver.Tests
             Assert.AreEqual("Lorem ipsum dolor", actual);
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementShadowRoot.html")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void GetScreenshotTest(string url) => Invoke(TestContext, url, (driver) =>
@@ -432,8 +444,8 @@ namespace G4.WebDriver.Tests
             var actual = driver.FindElement(By.Custom.Id("ShadowComponent")).GetScreenshot();
 
             // assert
-            Assert.IsTrue(actual.Bytes.Length != 0);
-            Assert.IsTrue(actual.ToString().Length > 0);
+            Assert.IsNotEmpty(actual.Bytes);
+            Assert.IsGreaterThan(0, actual.ToString().Length);
 
             // save
             actual.Save("image");
@@ -443,7 +455,7 @@ namespace G4.WebDriver.Tests
             Assert.IsTrue(file.Exists && file.Length > 0);
         });
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ElementInteractions.html")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void ElementEqualsTest(string url) => Invoke(TestContext, url, (driver) =>
@@ -454,8 +466,8 @@ namespace G4.WebDriver.Tests
             var element3 = driver.FindElement(By.Custom.Id("ClickButton"));
 
             // assert
-            Assert.IsTrue(!element3.Equals(element2));
-            Assert.IsTrue(!element3.Equals(element1));
+            Assert.IsFalse(element3.Equals(element2));
+            Assert.IsFalse(element3.Equals(element1));
             Assert.IsTrue(element1.Equals(element2));
         });
         #endregion

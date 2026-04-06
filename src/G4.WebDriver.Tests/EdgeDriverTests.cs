@@ -21,28 +21,9 @@ namespace G4.WebDriver.Tests
     [TestCategory("UnitTest")]
     public class EdgeDriverTests : TestBase<EdgeDriver>
     {
-        //[TestMethod]
-        //public void Test()
-        //{
-        //    //var options = new EdgeOptions();
-        //    //var driver = new RemoteWebDriver("http://localhost:4444/wd/hub", options.ConvertToCapabilities().NewSessionModel());
-        //    //driver.Dispose();
-
-        //    var automationJson = File.ReadAllText(@"E:\Garbage\z.txt");
-        //    var automation = JsonSerializer.Deserialize<G4AutomationModel>(automationJson, new JsonSerializerOptions
-        //    {
-        //        PropertyNameCaseInsensitive = true
-        //    });
-        //    var client = new G4Client();
-        //    client.Automation.Invoke(automation);
-
-        //    var a = "";
-        //}
-
         #region *** Logs            ***
-        [TestMethod(displayName: "Verify that the Edge WebDriver throws a InvalidArgumentException " +
+        [TestMethod(DisplayName = "Verify that the Edge WebDriver throws a InvalidArgumentException " +
             "for an invalid log type.")]
-        [ExpectedException(typeof(InvalidArgumentException))]
         public void GetLogInvalidLogTypeTest()
         {
             // Set up EdgeOptions and define invalid log preferences.
@@ -56,17 +37,20 @@ namespace G4.WebDriver.Tests
             });
 
             // Invoke the EdgeDriver and attempt to retrieve logs of an invalid type.
-            Invoke(TestContext, options, "Logs.html", (driver) =>
+            Assert.Throws<InvalidArgumentException>(() =>
             {
-                // Wait for the page to load.
-                Thread.Sleep(1500);
+                Invoke(TestContext, options, "Logs.html", (driver) =>
+                {
+                    // Wait for the page to load.
+                    Thread.Sleep(1500);
 
-                // Attempt to retrieve logs of an invalid type, which should throw a WebDriverException.
-                driver.Manage().Logs.GetLog("invalid");
+                    // Attempt to retrieve logs of an invalid type, which should throw a WebDriverException.
+                    driver.Manage().Logs.GetLog("invalid");
+                });
             });
         }
 
-        [TestMethod(displayName: "Verify that logs can be retrieved from the Edge WebDriver.")]
+        [TestMethod(DisplayName = "Verify that logs can be retrieved from the Edge WebDriver.")]
         #region *** Data Set ***
         [DataRow("browser")]
         [DataRow("driver")]
@@ -94,13 +78,13 @@ namespace G4.WebDriver.Tests
                 var driverLogs = driver.Manage().Logs.GetLog(logType).ToList();
 
                 // Assert that logs were retrieved and are not empty.
-                Assert.IsTrue(driverLogs.Count != 0, $"Expected logs of type '{logType}' but found none.");
+                Assert.IsNotEmpty(driverLogs, $"Expected logs of type '{logType}' but found none.");
             });
         }
         #endregion
 
         #region *** Sessions        ***
-        [TestMethod(displayName: "Verify that the WebDriverService starts, is ready, and correctly stops.")]
+        [TestMethod(DisplayName = "Verify that the WebDriverService starts, is ready, and correctly stops.")]
         [TestCategory("Local")]
         #region *** Data Set ***
         [DataRow("msedgedriver.exe", 9517)]
@@ -123,13 +107,13 @@ namespace G4.WebDriver.Tests
             service.Dispose();
 
             // Verify that the WebDriver service's server address matches the specified port
-            Assert.IsTrue(service.ServerAddress.Port == port, $"WebDriver service server address port mismatch. Expected port: {port}, but got: {service.ServerAddress.Port}.");
+            Assert.AreEqual(port, service.ServerAddress.Port, $"WebDriver service server address port mismatch. Expected port: {port}, but got: {service.ServerAddress.Port}.");
 
             // Verify that the WebDriver service is not ready after disposing
-            Assert.IsTrue(!service.Ready, "WebDriver service is still ready after disposing.");
+            Assert.IsFalse(service.Ready, "WebDriver service is still ready after disposing.");
         }
 
-        [TestMethod(displayName: "Verify that the EdgeWebDriverService starts, is ready, and correctly stops.")]
+        [TestMethod(DisplayName = "Verify that the EdgeWebDriverService starts, is ready, and correctly stops.")]
         [TestCategory("Local")]
         public void NewEdgeWebDriverServiceTest()
         {
@@ -149,10 +133,10 @@ namespace G4.WebDriver.Tests
             service.Dispose();
 
             // Verify that the Edge WebDriver service is not ready after disposing
-            Assert.IsTrue(!service.Ready, "Edge WebDriver service is still ready after disposing.");
+            Assert.IsFalse(service.Ready, "Edge WebDriver service is still ready after disposing.");
         }
 
-        [TestMethod(displayName: "Verify that a new EdgeDriver session can be created and disposed successfully.")]
+        [TestMethod(DisplayName = "Verify that a new EdgeDriver session can be created and disposed successfully.")]
         [TestCategory("Local")]
         public void NewDefaultSessionTest()
         {
@@ -160,13 +144,13 @@ namespace G4.WebDriver.Tests
             var driver = new EdgeDriver($"{TestContext.Properties["Grid.Endpoint"]}");
 
             // Verify that the EdgeDriver instance is not null after creation
-            Assert.IsTrue(driver != null, "EdgeDriver instance is null after creation. Expected a valid driver instance.");
+            Assert.IsNotNull(driver, "EdgeDriver instance is null after creation. Expected a valid driver instance.");
 
             // Dispose of the EdgeDriver instance
             driver.Dispose();
         }
 
-        [TestMethod(displayName: "Verify that a new EdgeDriver session can be created with options and disposed successfully.")]
+        [TestMethod(DisplayName = "Verify that a new EdgeDriver session can be created with options and disposed successfully.")]
         [TestCategory("Local")]
         public void NewSessionWithOptionsTest()
         {
@@ -177,13 +161,13 @@ namespace G4.WebDriver.Tests
             var driver = new EdgeDriver(options);
 
             // Verify that the EdgeDriver instance is not null after creation with options
-            Assert.IsTrue(driver != null, "EdgeDriver instance is null after creation with options. Expected a valid driver instance.");
+            Assert.IsNotNull(driver, "EdgeDriver instance is null after creation with options. Expected a valid driver instance.");
 
             // Dispose of the EdgeDriver instance
             driver.Dispose();
         }
 
-        [TestMethod(displayName: "Verify that a new EdgeDriver session can be created with EdgeWebDriverService and disposed successfully.")]
+        [TestMethod(DisplayName = "Verify that a new EdgeDriver session can be created with EdgeWebDriverService and disposed successfully.")]
         [TestCategory("Local")]
         public void NewSessionWithServiceTest()
         {
@@ -194,13 +178,13 @@ namespace G4.WebDriver.Tests
             var driver = new EdgeDriver(service);
 
             // Verify that the EdgeDriver instance is not null after creation with the service
-            Assert.IsTrue(driver != null, "EdgeDriver instance is null after creation with EdgeWebDriverService. Expected a valid driver instance.");
+            Assert.IsNotNull(driver, "EdgeDriver instance is null after creation with EdgeWebDriverService. Expected a valid driver instance.");
 
             // Dispose of the EdgeDriver instance
             driver.Dispose();
         }
 
-        [TestMethod(displayName: "Verify that a new EdgeDriver session can be created, quit, and disposed successfully.")]
+        [TestMethod(DisplayName = "Verify that a new EdgeDriver session can be created, quit, and disposed successfully.")]
         [TestCategory("Local")]
         public void NewSessionQuitDisposeTest()
         {
@@ -208,7 +192,7 @@ namespace G4.WebDriver.Tests
             var driver = new EdgeDriver($"{TestContext.Properties["Grid.Endpoint"]}");
 
             // Verify that the EdgeDriver instance is not null after creation
-            Assert.IsTrue(driver != null, "EdgeDriver instance is null after creation. Expected a valid driver instance.");
+            Assert.IsNotNull(driver, "EdgeDriver instance is null after creation. Expected a valid driver instance.");
 
             // Quit the EdgeDriver session
             driver.Quit();
@@ -217,7 +201,7 @@ namespace G4.WebDriver.Tests
             driver.Dispose();
         }
 
-        [TestMethod(displayName: "Verify that a new EdgeDriver session can be created, closed, quit, and disposed successfully.")]
+        [TestMethod(DisplayName = "Verify that a new EdgeDriver session can be created, closed, quit, and disposed successfully.")]
         [TestCategory("Local")]
         public void NewSessionCloseQuitDisposeTest()
         {
@@ -225,7 +209,7 @@ namespace G4.WebDriver.Tests
             var driver = new EdgeDriver($"{TestContext.Properties["Grid.Endpoint"]}");
 
             // Verify that the EdgeDriver instance is not null after creation
-            Assert.IsTrue(driver != null, "EdgeDriver instance is null after creation. Expected a valid driver instance.");
+            Assert.IsNotNull(driver, "EdgeDriver instance is null after creation. Expected a valid driver instance.");
 
             // Close the EdgeDriver window
             driver.Close();
@@ -237,7 +221,7 @@ namespace G4.WebDriver.Tests
             driver.Dispose();
         }
 
-        [TestMethod(displayName: "Verify that a new EdgeDriver session can be created with an extension and disposed successfully.")]
+        [TestMethod(DisplayName = "Verify that a new EdgeDriver session can be created with an extension and disposed successfully.")]
         [TestCategory("Local")]
         public void NewSessionAddExtensionTest()
         {
@@ -261,7 +245,9 @@ namespace G4.WebDriver.Tests
             driver.Dispose();
 
             // Verify that the EdgeDriver instance is not null after all operations
-            Assert.IsTrue(driver != null, "EdgeDriver instance is null after adding an extension and performing operations. Expected a valid driver instance.");
+            Assert.IsNotNull(
+                value: driver,
+                message: "EdgeDriver instance is null after adding an extension and performing operations. Expected a valid driver instance.");
         }
         #endregion
 
@@ -269,7 +255,7 @@ namespace G4.WebDriver.Tests
         [DoNotParallelize]
         [RetryableTestMethod(
             numberOfAttempts: 5,
-            displayName: "Verify that CDP commands can be invoked using EdgeDriver to navigate to a URL.")]
+            DisplayName = "Verify that CDP commands can be invoked using EdgeDriver to navigate to a URL.")]
         public void InvokeCdpTest() => Invoke(TestContext, url: string.Empty, action: (driver) =>
         {
             // Send a CDP command to navigate to a specific URL
@@ -289,10 +275,10 @@ namespace G4.WebDriver.Tests
             var url = driver.Navigate().Url;
 
             // Verify that the current URL contains "example.com" after navigation
-            Assert.IsTrue(url.Contains("example.com"), $"The URL '{url}' does not contain 'example.com' after navigating using CDP command.");
+            Assert.Contains("example.com", url, $"The URL '{url}' does not contain 'example.com' after navigating using CDP command.");
         });
 
-        [TestMethod(displayName: "Verify that cast sinks can be retrieved using Developer Tools in EdgeDriver.")]
+        [TestMethod(DisplayName = "Verify that cast sinks can be retrieved using Developer Tools in EdgeDriver.")]
         public void GetCastSinksTest() => Invoke(TestContext, url: string.Empty, action: (driver) =>
         {
             // Retrieve the list of available cast sinks using Developer Tools
@@ -302,15 +288,16 @@ namespace G4.WebDriver.Tests
             Assert.IsTrue(sinks.Any(), "No cast sinks were found. Expected at least one cast sink to be available.");
         });
 
-        [TestMethod(displayName: "Verify that an ArgumentException is thrown when selecting a null cast sink.")]
-        [ExpectedException(typeof(ArgumentException))]
+        [TestMethod(DisplayName = "Verify that an ArgumentException is thrown when selecting a null cast sink.")]
         public void SelectCastSinksExceptionTest() => Invoke(TestContext, url: string.Empty, action: (driver) =>
         {
             // Attempt to set a null cast sink, which should throw an ArgumentException
-            driver.DeveloperTools.Cast.SetSinkToUse(null);
+            Assert.Throws<ArgumentException>(
+                action: () => driver.DeveloperTools.Cast.SetSinkToUse(null),
+                message: "Expected an ArgumentException when setting a null cast sink, but no exception was thrown.");
         });
 
-        [TestMethod(displayName: "Verify that a cast sink can be selected using Developer Tools in EdgeDriver.")]
+        [TestMethod(DisplayName = "Verify that a cast sink can be selected using Developer Tools in EdgeDriver.")]
         public void SelectCastSinksTest() => Invoke(TestContext, url: string.Empty, action: (driver) =>
         {
             // Retrieve the list of available cast sinks using Developer Tools
@@ -320,21 +307,22 @@ namespace G4.WebDriver.Tests
             var name = sinks?.First().Name;
 
             // Verify that the name of the sink is not null or empty
-            Assert.IsTrue(!string.IsNullOrEmpty(name), "The cast sink name is null or empty. Expected a valid sink name.");
+            Assert.IsFalse(string.IsNullOrEmpty(name), "The cast sink name is null or empty. Expected a valid sink name.");
 
             // Set the sink to use for casting
             driver.DeveloperTools.Cast.SetSinkToUse(name);
         });
 
-        [TestMethod(displayName: "Verify that an ArgumentException is thrown when starting tab mirroring with a null sink name.")]
-        [ExpectedException(typeof(ArgumentException))]
+        [TestMethod(DisplayName = "Verify that an ArgumentException is thrown when starting tab mirroring with a null sink name.")]
         public void StartCastTabMirroringExceptionTest() => Invoke(TestContext, url: string.Empty, action: (driver) =>
         {
             // Attempt to start tab mirroring with a null sink name, which should throw an ArgumentException
-            driver.DeveloperTools.Cast.StartTabMirroring(null);
+            Assert.Throws<ArgumentException>(
+                action: () => driver.DeveloperTools.Cast.StartTabMirroring(null),
+                message: "Expected an ArgumentException when starting tab mirroring with a null sink name, but no exception was thrown.");
         });
 
-        [TestMethod(displayName: "Verify that tab mirroring can be started using a valid cast " +
+        [TestMethod(DisplayName = "Verify that tab mirroring can be started using a valid cast " +
             "sink name with Developer Tools in EdgeDriver.")]
         public void StartCastTabMirroringTest() => Invoke(TestContext, url: string.Empty, action: (driver) =>
         {
@@ -345,7 +333,7 @@ namespace G4.WebDriver.Tests
             var name = sinks?.First().Name;
 
             // Verify that the name of the sink is not null or empty
-            Assert.IsTrue(!string.IsNullOrEmpty(name), "The cast sink name is null or empty. Expected a valid sink name.");
+            Assert.IsFalse(string.IsNullOrEmpty(name), "The cast sink name is null or empty. Expected a valid sink name.");
 
             // Wait for 3 seconds before starting tab mirroring
             Thread.Sleep(3000);
@@ -354,16 +342,17 @@ namespace G4.WebDriver.Tests
             driver.DeveloperTools.Cast.StartTabMirroring(name);
         });
 
-        [TestMethod(displayName: "Verify that an ArgumentException is thrown when starting desktop mirroring with a null sink name.")]
-        [ExpectedException(typeof(ArgumentException))]
+        [TestMethod(DisplayName = "Verify that an ArgumentException is thrown when starting desktop mirroring with a null sink name.")]
         public void StartDesktopMirroringExceptionTest() => Invoke(TestContext, url: string.Empty, action: (driver) =>
         {
             // Attempt to start desktop mirroring with a null sink name, which should throw an ArgumentException
-            driver.DeveloperTools.Cast.StartDesktopMirroring(null);
+            Assert.Throws<ArgumentException>(
+                action: () => driver.DeveloperTools.Cast.StartDesktopMirroring(null),
+                message: "Expected an ArgumentException when starting desktop mirroring with a null sink name, but no exception was thrown.");
         });
 
         [Ignore(message: "The test is blocked by the browser screen selection.")]
-        [TestMethod(displayName: "Verify that desktop mirroring can be started using a valid cast sink name with Developer Tools in EdgeDriver.")]
+        [TestMethod(DisplayName = "Verify that desktop mirroring can be started using a valid cast sink name with Developer Tools in EdgeDriver.")]
         public void StartDesktopMirroringTest() => Invoke(TestContext, url: string.Empty, action: (driver) =>
         {
             // Retrieve the list of available cast sinks using Developer Tools
@@ -373,7 +362,7 @@ namespace G4.WebDriver.Tests
             var name = sinks?.First().Name;
 
             // Verify that the name of the sink is not null or empty
-            Assert.IsTrue(!string.IsNullOrEmpty(name), "The cast sink name is null or empty. Expected a valid sink name.");
+            Assert.IsFalse(string.IsNullOrEmpty(name), "The cast sink name is null or empty. Expected a valid sink name.");
 
             // Start desktop mirroring with the selected sink
             driver.DeveloperTools.Cast.StartDesktopMirroring(name);
@@ -381,7 +370,7 @@ namespace G4.WebDriver.Tests
         #endregion
 
         #region *** Developer Tools ***
-        [TestMethod(displayName: "Verify that CDP commands can be sent to navigate to a URL using EdgeDriver.")]
+        [TestMethod(DisplayName = "Verify that CDP commands can be sent to navigate to a URL using EdgeDriver.")]
         [TestCategory("Local")]
         public void SendCdpCommandTest()
         {
@@ -435,7 +424,7 @@ namespace G4.WebDriver.Tests
         #endregion
 
         #region *** Cookies         ***
-        [TestMethod(displayName: "Verify that a cookie can be added successfully.")]
+        [TestMethod(DisplayName = "Verify that a cookie can be added successfully.")]
         public void AddCookieTest() => Invoke(TestContext, "Cookies.html", (driver) =>
         {
             // Create a new cookie with a specific name and value.
@@ -452,21 +441,20 @@ namespace G4.WebDriver.Tests
             var actual = driver.Manage().Cookies.GetCookie("TestCookie");
 
             // Assert that the cookie value matches the expected value.
-            Assert.IsTrue(actual.Value == "TestValue", "The cookie value does not match the expected value.");
+            Assert.AreEqual("TestValue", actual.Value, "The cookie value does not match the expected value.");
         });
 
-        [TestMethod(displayName: "Verify that all cookies can be deleted successfully.")]
+        [TestMethod(DisplayName = "Verify that all cookies can be deleted successfully.")]
         public void DeleteCookiesTest() => Invoke(TestContext, "Cookies.html", (driver) =>
         {
             // Delete all cookies in the browser.
             driver.Manage().Cookies.DeleteCookies();
 
             // Assert that no cookies remain.
-            Assert.IsTrue(driver.Manage().Cookies.Cookies.Count == 0, "Cookies were not deleted successfully.");
+            Assert.IsEmpty(driver.Manage().Cookies.Cookies, "Cookies were not deleted successfully.");
         });
 
-        [TestMethod(displayName: "Verify that deleting a specific cookie works as expected.")]
-        [ExpectedException(typeof(NoSuchCookieException))]
+        [TestMethod(DisplayName = "Verify that deleting a specific cookie works as expected.")]
         public void DeleteCookieTest() => Invoke(TestContext, "Cookies.html", (driver) =>
         {
             // Create a cookie model representing the cookie to be deleted.
@@ -479,42 +467,44 @@ namespace G4.WebDriver.Tests
             driver.Manage().Cookies.DeleteCookie(cookie);
 
             // Attempt to retrieve the deleted cookie, expecting an exception to be thrown.
-            driver.Manage().Cookies.GetCookie("NID");
+            Assert.Throws<NoSuchCookieException>(
+                action: () => driver.Manage().Cookies.GetCookie("NID"),
+                message: "Expected a NoSuchCookieException when retrieving a deleted cookie, but no exception was thrown.");
         });
 
-        [TestMethod(displayName: "Verify that cookies can be retrieved successfully.")]
+        [TestMethod(DisplayName = "Verify that cookies can be retrieved successfully.")]
         public void GetCookiesTest() => Invoke(TestContext, "Cookies.html", (driver) =>
         {
             // Retrieve all cookies from the browser.
             var cookies = driver.Manage().Cookies.Cookies;
 
             // Assert that the cookies collection is not empty.
-            Assert.IsTrue(cookies.Count != 0, "No cookies were retrieved.");
+            Assert.IsNotEmpty(cookies, "No cookies were retrieved.");
         });
 
-        [TestMethod(displayName: "Verify that a specific cookie can be retrieved successfully.")]
+        [TestMethod(DisplayName = "Verify that a specific cookie can be retrieved successfully.")]
         public void GetCookieTest() => Invoke(TestContext, "Cookies.html", (driver) =>
         {
             // Retrieve a specific cookie by its name.
             var cookie = driver.Manage().Cookies.GetCookie("NID");
 
             // Assert that the cookie value is not empty.
-            Assert.IsTrue(cookie.Value.Length > 0, "The cookie value is empty.");
+            Assert.IsGreaterThan(0, cookie.Value.Length, "The cookie value is empty.");
         });
         #endregion
 
         #region *** Navigation      ***
-        [TestMethod(displayName: "Verify that the current page title can be retrieved successfully.")]
+        [TestMethod(DisplayName = "Verify that the current page title can be retrieved successfully.")]
         public void GetTitleTest() => Invoke(TestContext, "Navigation.html", (driver) =>
         {
             // Retrieve the current page title.
             var title = driver.Navigate().Title;
 
             // Assert that the title is not empty.
-            Assert.IsTrue(title.Length > 0, "The page title is empty.");
+            Assert.IsGreaterThan(0, title.Length, "The page title is empty.");
         });
 
-        [TestMethod(displayName: "Verify that the current page URL can be retrieved successfully.")]
+        [TestMethod(DisplayName = "Verify that the current page URL can be retrieved successfully.")]
         public void GetUrlTest() => Invoke(TestContext, "Navigation.html", (driver) =>
         {
             // Retrieve the current page URL.
@@ -524,7 +514,7 @@ namespace G4.WebDriver.Tests
             Assert.IsTrue(url.Contains("Navigation.html", StringComparison.OrdinalIgnoreCase), "The page URL is empty.");
         });
 
-        [TestMethod(displayName: "Verify that a URL can be opened successfully.")]
+        [TestMethod(DisplayName = "Verify that a URL can be opened successfully.")]
         public void OpenUrlTest() => Invoke(TestContext, "Navigation.html", (driver) =>
         {
             // Retrieve the current page URL.
@@ -538,7 +528,7 @@ namespace G4.WebDriver.Tests
                 "The URL does not contain the expected query parameter 'param=1'.");
         });
 
-        [TestMethod(displayName: "Verify Redo and Undo navigation with query parameters.")]
+        [TestMethod(DisplayName = "Verify Redo and Undo navigation with query parameters.")]
         public void RedoUndoNavigationTest() => Invoke(TestContext, "Navigation.html", (driver) =>
         {
             // Retrieve the current page URL.
@@ -555,7 +545,7 @@ namespace G4.WebDriver.Tests
             driver.Navigate().Undo();
 
             // Assert that the URL no longer contains the query parameter after Undo.
-            Assert.IsTrue(!driver.Navigate().Url.Contains("param=1", StringComparison.OrdinalIgnoreCase),
+            Assert.IsFalse(driver.Navigate().Url.Contains("param=1", StringComparison.OrdinalIgnoreCase),
                 "The URL still contains the query parameter 'param=1' after undoing the navigation.");
 
             // Perform the Redo navigation action.
@@ -566,7 +556,7 @@ namespace G4.WebDriver.Tests
                 "The URL does not contain the expected query parameter 'param=1' after redoing the navigation.");
         });
 
-        [TestMethod(displayName: "Verify that the browser can be refreshed successfully.")]
+        [TestMethod(DisplayName = "Verify that the browser can be refreshed successfully.")]
         public void RefreshTest() => Invoke(TestContext, "Navigation.html", (driver) =>
         {
             // Refresh the page.
@@ -579,22 +569,19 @@ namespace G4.WebDriver.Tests
         #endregion
 
         #region *** Timeouts        ***
-        [TestMethod(displayName: "Verify that a page load timeout is triggered correctly.")]
-        [ExpectedException(typeof(WebDriverTimeoutException))]
+        [TestMethod(DisplayName = "Verify that a page load timeout is triggered correctly.")]
         public void PageLoadTimeoutTest() => Invoke(TestContext, url: string.Empty, (driver) =>
         {
             // Set the page load timeout to 5 seconds.
             driver.Manage().Timeouts.PageLoad = TimeSpan.FromSeconds(5);
 
             // Attempt to open a page that will not load.
-            driver.Navigate().Open("http://localhost:9002/test/static/Timeouts.html?blockLoad=true");
-
-            // This point should not be reached if a page load timeout occurs.
-            Assert.Fail("Expected a WebDriverTimeoutException, but the operation completed without timing out.");
+            Assert.Throws<WebDriverTimeoutException>(
+                action: () => driver.Navigate().Open("http://localhost:9002/test/static/Timeouts.html?blockLoad=true"),
+                message: "Expected a WebDriverTimeoutException when opening a page that blocks loading, but no exception was thrown.");
         });
 
-        [TestMethod(displayName: "Verify that a find element timeout is triggered correctly.")]
-        [ExpectedException(typeof(NoSuchElementException))]
+        [TestMethod(DisplayName = "Verify that a find element timeout is triggered correctly.")]
         public void FindElementTimeoutTest() => Invoke(TestContext, "Timeouts.html", (driver) =>
         {
             // Create a stopwatch to measure the time taken to locate an element.
@@ -603,65 +590,71 @@ namespace G4.WebDriver.Tests
             // Set the implicit wait timeout to 5 seconds.
             driver.Manage().Timeouts.Implicit = TimeSpan.FromSeconds(5);
 
-            try
+            // Attempt to find an element that does not exist,
+            // expecting a NoSuchElementException to be thrown.
+            Assert.Throws<NoSuchElementException>(() =>
             {
-                // Start measuring time to locate the element.
-                stopwatch.Start();
+                try
+                {
+                    // Start measuring time to locate the element.
+                    stopwatch.Start();
 
-                // Attempt to find an element that does not exist.
-                driver.FindElement(By.CssSelector("#nonexistent"));
-            }
-            catch (NoSuchElementException)
-            {
-                // Re-throw the expected exception to match the test's ExpectedException attribute.
-                throw;
-            }
-            finally
-            {
-                // Stop the stopwatch after attempting to find the element.
-                stopwatch.Stop();
+                    // Attempt to find an element that does not exist.
+                    driver.FindElement(By.CssSelector("#nonexistent"));
+                }
+                catch (NoSuchElementException)
+                {
+                    // Re-throw the expected exception to match the test's ExpectedException attribute.
+                    throw;
+                }
+                finally
+                {
+                    // Stop the stopwatch after attempting to find the element.
+                    stopwatch.Stop();
 
-                // Assert that the find element timeout occurred in more than 5 seconds.
-                Assert.IsTrue(stopwatch.ElapsedTicks > 5 * TimeSpan.TicksPerSecond,
-                    "The find element operation took longer than expected.");
-            }
+                    // Assert that the find element timeout occurred in more than 5 seconds.
+                    Assert.IsGreaterThan(5 * TimeSpan.TicksPerSecond, stopwatch.ElapsedTicks,
+                        "The find element operation took longer than expected.");
+                }
+            });
         });
 
-        [TestMethod(displayName: "Verify that an async script execution timeout is triggered correctly.")]
-        [ExpectedException(typeof(ScriptTimeoutException))]
+        [TestMethod(DisplayName = "Verify that an async script execution timeout is triggered correctly.")]
         public void AsyncScriptTimeoutTest() => Invoke(TestContext, "Timeouts.html", (driver) =>
         {
             // Set the script execution timeout to 5 seconds.
             driver.Manage().Timeouts.Script = TimeSpan.FromSeconds(5);
 
             // Attempt to execute an async script that will not complete.
-            driver.InvokeAsyncScript(@"
-                var callback = arguments[arguments.length - 1];
-                setTimeout(function() {
-                    callback('Script completed after delay');
-                }, 10000); // 10-second delay
-            ");
-
-            // This point should not be reached if an async script execution timeout occurs.
-            Assert.Fail("Expected a ScriptTimeoutException, but the operation completed without timing out.");
+            Assert.Throws<ScriptTimeoutException>(() =>
+            {
+                driver.InvokeAsyncScript(@"
+                    var callback = arguments[arguments.length - 1];
+                    setTimeout(function() {
+                        callback('Script completed after delay');
+                    }, 10000); // 10-second delay
+                ");
+            });
         });
 
-        [TestMethod(displayName: "Verify that a script execution timeout is triggered correctly.")]
-        [ExpectedException(typeof(ScriptTimeoutException))]
+        [TestMethod(DisplayName = "Verify that a script execution timeout is triggered correctly.")]
         public void ScriptTimeoutTest() => Invoke(TestContext, "Timeouts.html", (driver) =>
         {
             // Set the script execution timeout to 5 seconds.
             driver.Manage().Timeouts.Script = TimeSpan.FromSeconds(5);
 
             // Attempt to execute a script that will not complete.
-            driver.InvokeScript(@"
-                var start = new Date().getTime();
-                // Busy-wait loop for 10 seconds
-                while (new Date().getTime() - start < 10000) {
-                    // Blocking the main thread intentionally
-                }
-                return 'Script completed after delay';
-            ");
+            Assert.Throws<ScriptTimeoutException>(() =>
+            {
+                driver.InvokeScript(@"
+                    var start = new Date().getTime();
+                    // Busy-wait loop for 10 seconds
+                    while (new Date().getTime() - start < 10000) {
+                        // Blocking the main thread intentionally
+                    }
+                    return 'Script completed after delay';
+                ");
+            });
 
             // This point should not be reached if a script execution timeout occurs.
             Assert.Fail("Expected a ScriptTimeoutException, but the operation completed without timing out.");
