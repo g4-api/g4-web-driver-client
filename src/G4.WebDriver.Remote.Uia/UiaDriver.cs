@@ -234,8 +234,8 @@ namespace G4.WebDriver.Remote.Uia
         /// <inheritdoc />
         public void SendInputs(int repeat, params string[] codes)
         {
-            // Prepare the WebDriver command for sending scan codes to the server for input simulation
-            var command = Invoker.Commands["SendUser32Inputs"];
+            // Create an invocation-owned scan-code command so repeated input requests cannot exchange payload state.
+            var command = Invoker.NewCommand(commandName: "SendUser32Inputs");
             command.Session = Session.OpaqueKey;
             command.Data = new ScanCodesInputModel
             {
@@ -277,8 +277,8 @@ namespace G4.WebDriver.Remote.Uia
         /// <inheritdoc />
         public void SendKeys(int repeat, string text)
         {
-            // Prepare the WebDriver command for sending text input to the server for input simulation
-            var command = Invoker.Commands["SendUser32Keys"];
+            // Create an invocation-owned text command so repeated input requests cannot exchange payload state.
+            var command = Invoker.NewCommand(commandName: "SendUser32Keys");
             command.Session = Session.OpaqueKey;
             command.Data = new TextInputModel
             {

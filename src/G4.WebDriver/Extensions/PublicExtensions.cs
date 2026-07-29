@@ -772,25 +772,25 @@ namespace G4.WebDriver.Extensions
         /// <exception cref="NotSupportedException">Thrown when the specified command is not supported.</exception>
         public static WebDriverCommandModel NewCommand(this IWebDriverCommandInvoker invoker, string commandName)
         {
-            // Check if the invoker is null
-            if (invoker == null)
+            // Require an invoker before reading its registered command templates.
+            ArgumentNullException.ThrowIfNull(
+                argument: invoker,
+                paramName: nameof(invoker));
+
+            // Reject an absent template before allocating invocation-owned command state.
+            if (string.IsNullOrEmpty(commandName) ||
+                !invoker.Commands.TryGetValue(commandName, out var template))
             {
-                throw new ArgumentNullException(nameof(invoker), "The invoker cannot be null.");
+                var message = $"The command '{commandName}' is not supported.";
+                throw new NotSupportedException(message);
             }
 
-            // Check if the command name is empty or not present in the invoker's commands
-            if (string.IsNullOrEmpty(commandName) || !invoker.Commands.TryGetValue(commandName, out WebDriverCommandModel value))
-            {
-                throw new NotSupportedException($"The command '{commandName}' is not supported.");
-            }
+            // Copy the registered template so route, payload, and element mutations remain local to this invocation.
+            var command = template.Copy();
 
-            // Get the command from the invoker's commands
-            var command = value;
-
-            // Set the session for the command, if a session is available
+            // Apply the active session only to the new command so the registered template remains reusable.
             command.Session = invoker.Session?.OpaqueKey;
 
-            // Return the created command
             return command;
         }
 

@@ -264,48 +264,35 @@ namespace G4.WebDriver.Remote
         /// Invokes a WebDriver command by name.
         /// </summary>
         /// <param name="commandName">The name of the WebDriver command to be invoked.</param>
-        /// <returns>The response model containing the result of the WebDriver command execution.</returns>
+        /// <returns>The response model containing the result of the command invoked without a request payload.</returns>
         public WebDriverResponseModel Invoke(string commandName)
         {
-            // Check if the command name is null or empty, or if the command is not found in the dictionary.
-            if (string.IsNullOrEmpty(commandName) || !Commands.TryGetValue(commandName, out WebDriverCommandModel commandOut))
-            {
-                throw new NotSupportedException($"The WebDriver command with the name '{commandName}' is not supported or not found.");
-            }
-
-            // Retrieve the WebDriver command from the dictionary.
-            var command = commandOut;
-
-            // Set the command data to null and set the session if available.
-            command.Data = null;
-            command.Session = Session?.OpaqueKey;
-
-            // Invoke the WebDriver command and return the command response model.
-            return Invoke(command);
+            // Route payload-free callers through the complete overload so command ownership has one implementation.
+            return Invoke(commandName, data: null);
         }
 
         /// <summary>
         /// Invokes a WebDriver command by name and with the specified data.
         /// </summary>
         /// <param name="commandName">The name of the WebDriver command to be invoked.</param>
-        /// <param name="data">The data to be associated with the command.</param>
+        /// <param name="data">The optional request payload assigned only to this command invocation.</param>
         /// <returns>The response model containing the result of the WebDriver command execution.</returns>
         public WebDriverResponseModel Invoke(string commandName, object data)
         {
-            // Check if the command name is null or empty, or if the command is not found in the dictionary.
-            if (string.IsNullOrEmpty(commandName) || !Commands.TryGetValue(commandName, out WebDriverCommandModel commandOut))
+            // Reject an unsupported command before allocating invocation-owned request state.
+            if (string.IsNullOrEmpty(commandName) || !Commands.TryGetValue(commandName, out var commandOut))
             {
-                throw new NotSupportedException($"The WebDriver command with the name '{commandName}' is not supported or not found.");
+                var message = $"The WebDriver command with the name '{commandName}' is not supported or not found.";
+                throw new NotSupportedException(message);
             }
 
-            // Retrieve the WebDriver command from the dictionary.
-            var command = commandOut;
+            // Copy the registered template so this invocation owns every mutable request value.
+            var command = commandOut.Copy();
 
-            // Set the command data and session.
+            // Apply the request-specific payload and session without changing the reusable template.
             command.Data = data;
             command.Session = Session?.OpaqueKey;
 
-            // Invoke the WebDriver command and return the command response model.
             return Invoke(command);
         }
 
@@ -346,41 +333,46 @@ namespace G4.WebDriver.Remote
         /// <returns>The response model containing the result of the WebDriver command execution.</returns>
         public WebDriverResponseModel Invoke(WebDriverCommandModel command)
         {
-            // Set the content type for the command to JSON
-            command.ContentType = "application/json";
+            // Require a command before allocating the isolated request sent to the remote endpoint.
+            ArgumentNullException.ThrowIfNull(
+                argument: command,
+                paramName: nameof(command));
 
-            // Replace placeholders in the command route with session and element values
-            command.Route = command
+            // Copy caller-owned state so route expansion and transport metadata never escape this invocation.
+            var invocation = command.Copy();
+            invocation.ContentType = "application/json";
+
+            // Resolve placeholders only on the invocation copy so registered templates remain reusable.
+            invocation.Route = invocation
                 .Route
-                .Replace("$[session]", command.Session)
-                .Replace("$[element]", command.Element);
+                .Replace("$[session]", invocation.Session)
+                .Replace("$[element]", invocation.Element);
 
-            // Get the server address and remove trailing slashes
+            // Normalize the server address once so event observers and transport use the same endpoint root.
             var serverAddress = ServerAddress.AbsoluteUri.Trim('/');
 
-            // Invoke the CommandInvoking event
-            CommandInvoking?.Invoke(sender: this, e: new(serverAddress, command));
+            // Publish the resolved invocation without exposing or mutating the registered command template.
+            CommandInvoking?.Invoke(sender: this, e: new(serverAddress, invocation));
 
-            // Send the command and get the response
-            var response = command.Send(_httpClient, baseUrl: serverAddress, _timeout, _keepAlive);
+            // Send the isolated request so concurrent invocations cannot exchange route, element, or payload state.
+            var response = invocation.Send(_httpClient, baseUrl: serverAddress, _timeout, _keepAlive);
 
-            // Invoke the CommandInvoked event
+            // Publish the completed transport response after the request lifecycle finishes.
             CommandInvoked?.Invoke(sender: this, e: new(serverAddress, response));
 
-            // Handle special case for 404 Not Found with no session (NoSuchSessionException)
-            if (response.StatusCode == HttpStatusCode.NotFound && string.IsNullOrEmpty(command.Session))
+            // Translate an anonymous 404 into the established missing-session failure contract.
+            if (response.StatusCode == HttpStatusCode.NotFound && string.IsNullOrEmpty(invocation.Session))
             {
                 var error404 = response.Content.ReadAsStringAsync().Result;
                 throw new NoSuchSessionException(error404);
             }
 
-            // Create a WebDriver response model from the HTTP response
+            // Convert the transport result before applying the shared WebDriver error mapping.
             var webDriverResponse = WebDriverResponseModel.New(response);
 
-            // Assert the WebDriver response
+            // Enforce protocol errors before returning the successful response to the caller.
             AssertWebDriverResponse(webDriverResponse);
 
-            // Return the WebDriver response model
             return webDriverResponse;
         }
 
