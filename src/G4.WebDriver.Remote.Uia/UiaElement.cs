@@ -1,4 +1,5 @@
-﻿using G4.WebDriver.Models;
+﻿using G4.WebDriver.Extensions;
+using G4.WebDriver.Models;
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -43,8 +44,8 @@ namespace G4.WebDriver.Remote.Uia
         /// <inheritdoc />
         new public string GetAttribute(string attributeName)
         {
-            // Prepare the WebDriver command for retrieving the value of an attribute for the current WebElement
-            var command = _invoker.Commands["GetUser32Attribute"];
+            // Create an invocation-owned attribute command so changing route values cannot alter the registered template.
+            var command = _invoker.NewCommand(commandName: "GetUser32Attribute");
             command.Session = _session.OpaqueKey;
             command.Element = Id;
 
@@ -70,8 +71,8 @@ namespace G4.WebDriver.Remote.Uia
         /// <inheritdoc />
         public void MoveToElement(MousePositionInputModel positionData)
         {
-            // Prepare the WebDriver command for moving the mouse pointer to the current WebElement
-            var command = _invoker.Commands["MoveUser32MouseToElement"];
+            // Create an invocation-owned movement command so this element and payload remain isolated from later requests.
+            var command = _invoker.NewCommand(commandName: "MoveUser32MouseToElement");
             command.Session = _session.OpaqueKey;
             command.Element = Id;
             command.Data = positionData;
@@ -83,8 +84,8 @@ namespace G4.WebDriver.Remote.Uia
         /// <inheritdoc />
         public void SendClick()
         {
-            // Prepare the WebDriver command for sending a native click command to the current WebElement
-            var command = _invoker.Commands["SendUser32ClickToElement"];
+            // Create an invocation-owned click command so this element identifier never changes the registered template.
+            var command = _invoker.NewCommand(commandName: "SendUser32ClickToElement");
             command.Session = _session.OpaqueKey;
             command.Element = Id;
 
@@ -95,8 +96,8 @@ namespace G4.WebDriver.Remote.Uia
         /// <inheritdoc />
         public void SendDoubleClick()
         {
-            // Prepare the WebDriver command for sending a native double-click command to the current WebElement
-            var command = _invoker.Commands["SendUser32DoubleClickToElement"];
+            // Create an invocation-owned double-click command so concurrent element requests retain independent state.
+            var command = _invoker.NewCommand(commandName: "SendUser32DoubleClickToElement");
             command.Session = _session.OpaqueKey;
             command.Element = Id;
 
@@ -107,8 +108,8 @@ namespace G4.WebDriver.Remote.Uia
         /// <inheritdoc />
         public void SetFocus()
         {
-            // Prepare the WebDriver command for setting focus on the current WebElement
-            var command = _invoker.Commands["SetUser32Focus"];
+            // Create an invocation-owned focus command so sequential elements resolve to their own endpoint routes.
+            var command = _invoker.NewCommand(commandName: "SetUser32Focus");
             command.Session = _session.OpaqueKey;
             command.Element = Id;
 
