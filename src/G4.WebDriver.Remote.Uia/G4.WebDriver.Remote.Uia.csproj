@@ -25,7 +25,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\G4.WebDriver.Remote.Appium\G4.WebDriver.Remote.Appium.csproj" />
+	  <ProjectReference Include="..\G4.WebDriver\G4.WebDriver.csproj" />
 	</ItemGroup>
 
 </Project>

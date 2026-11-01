@@ -67,10 +67,15 @@ namespace G4.WebDriver.Models
             // Read the response content as a string
             var content = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
-            // Check if the content is valid JSON
+            // Keep the transport response for non-JSON content (such as an XML document) so callers can read the raw
+            // body and status, while the absent value keeps the existing JSON contract unchanged.
             if (!content.AssertJson())
             {
-                return new WebDriverResponseModel();
+                return new WebDriverResponseModel
+                {
+                    WebDriverResponse = response,
+                    WebDriverStatusCode = (int)response.StatusCode
+                };
             }
 
             // Parse the JSON document

@@ -119,6 +119,9 @@ ipch/
 *.vspx
 *.sap
 
+# The SAP client project folder ends in .Sap, so re-include it after the profiler rule above
+!src/G4.WebDriver.Remote.Sap/
+
 # Visual Studio Trace Files
 *.e2e
 
