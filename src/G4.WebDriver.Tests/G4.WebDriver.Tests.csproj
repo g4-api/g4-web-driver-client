@@ -31,15 +31,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.MiddlewareAnalysis" Version="10.0.10" PrivateAssets="all" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
-		<PackageReference Include="MSTest.TestAdapter" Version="4.3.2" />
-		<PackageReference Include="MSTest.TestFramework" Version="4.3.2" />
-		<PackageReference Include="coverlet.collector" Version="10.0.1">
+		<PackageReference Include="Microsoft.AspNetCore.MiddlewareAnalysis" Version="10.0.14" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+		<PackageReference Include="MSTest.TestAdapter" Version="4.5.2" />
+		<PackageReference Include="MSTest.TestFramework" Version="4.5.2" />
+		<PackageReference Include="coverlet.collector" Version="10.1.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.3.1" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -49,6 +49,7 @@
 		<ProjectReference Include="..\G4.WebDriver.Remote.Edge\G4.WebDriver.Remote.Edge.csproj" />
 		<ProjectReference Include="..\G4.WebDriver.Remote.Firefox\G4.WebDriver.Remote.Firefox.csproj" />
 		<ProjectReference Include="..\G4.WebDriver.Remote.Opera\G4.WebDriver.Remote.Opera.csproj" />
+		<ProjectReference Include="..\G4.WebDriver.Remote.Sap\G4.WebDriver.Remote.Sap.csproj" />
 		<ProjectReference Include="..\G4.WebDriver.Remote.Uia\G4.WebDriver.Remote.Uia.csproj" />
 		<ProjectReference Include="..\G4.WebDriver.Simulator\G4.WebDriver.Simulator.csproj" />
 		<ProjectReference Include="..\G4.WebDriver\G4.WebDriver.csproj" />

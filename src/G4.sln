@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Remote.MacOs",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Remote.Opera", "G4.WebDriver.Remote.Opera\G4.WebDriver.Remote.Opera.csproj", "{9A2954D9-42EE-4E1C-BA4C-54638CE2EC62}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Remote.Sap", "G4.WebDriver.Remote.Sap\G4.WebDriver.Remote.Sap.csproj", "{EB1B42C3-364B-4087-8B21-417DB8D8C521}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Remote.Uia", "G4.WebDriver.Remote.Uia\G4.WebDriver.Remote.Uia.csproj", "{4F3603F6-E57E-4976-92E9-97BB71DE477A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G4.WebDriver.Simulator", "G4.WebDriver.Simulator\G4.WebDriver.Simulator.csproj", "{7956AADD-2F11-4AB4-A417-B209B8510B60}"
@@ -120,6 +122,10 @@ Global
 		{0FF3C742-D247-4AED-ACC0-2627AED0F0AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FF3C742-D247-4AED-ACC0-2627AED0F0AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FF3C742-D247-4AED-ACC0-2627AED0F0AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB1B42C3-364B-4087-8B21-417DB8D8C521}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB1B42C3-364B-4087-8B21-417DB8D8C521}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB1B42C3-364B-4087-8B21-417DB8D8C521}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB1B42C3-364B-4087-8B21-417DB8D8C521}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -11,7 +11,7 @@ A from-scratch .NET WebDriver protocol client library for remotely controlling w
 G4.WebDriver communicates with browser/device driver processes (chromedriver, msedgedriver, geckodriver, Appium) using the W3C WebDriver protocol over HTTP. It provides a standardized `IWebDriver` interface implemented across multiple driver types:
 
 | Driver | Package | Description |
-|--------|---------|-------------|
+| --- | --- | --- |
 | `ChromeDriver` | `G4.WebDriver.Remote.Chrome` | Google Chrome automation |
 | `EdgeDriver` | `G4.WebDriver.Remote.Edge` | Microsoft Edge automation |
 | `FirefoxDriver` | `G4.WebDriver.Remote.Firefox` | Mozilla Firefox automation |
@@ -20,6 +20,7 @@ G4.WebDriver communicates with browser/device driver processes (chromedriver, ms
 | `IosDriver` | `G4.WebDriver.Remote.Ios` | iOS device automation via Appium |
 | `MacOsDriver` | `G4.WebDriver.Remote.MacOs` | macOS application automation via Appium |
 | `UiaDriver` | `G4.WebDriver.Remote.Uia` | Windows desktop UI automation |
+| `SapDriver` | `G4.WebDriver.Remote.Sap` | SAP GUI for Windows automation via SAP GUI Scripting |
 | `SimulatorDriver` | `G4.WebDriver.Simulator` | Browser-less mock driver for unit testing |
 | `RemoteWebDriver` | `G4.WebDriver` | Generic driver for any WebDriver-compatible endpoint |
 
@@ -30,6 +31,7 @@ G4.WebDriver communicates with browser/device driver processes (chromedriver, ms
 - **Multi-Browser Support** -- Chrome, Edge, Firefox, and Opera with driver process lifecycle management
 - **Mobile Automation** -- Android, iOS, and macOS via Appium protocol
 - **Desktop Automation** -- Windows UI Automation (UIA) for native desktop applications
+- **SAP GUI Automation** -- SAP GUI for Windows through SAP GUI Scripting
 - **Chrome DevTools Protocol** -- Direct CDP access on Chromium-based browsers
 - **Simulator** -- Mock driver for unit testing without launching real browsers
 - **Event-Driven Architecture** -- Pre/post command invocation hooks for logging, auditing, and extensions
@@ -61,6 +63,7 @@ dotnet add package G4.WebDriver.Remote.Android
 dotnet add package G4.WebDriver.Remote.Ios
 dotnet add package G4.WebDriver.Remote.MacOs
 dotnet add package G4.WebDriver.Remote.Uia
+dotnet add package G4.WebDriver.Remote.Sap
 ```
 
 For unit testing without a real browser:
@@ -105,7 +108,7 @@ driver.Quit();
 ## Supported Platforms
 
 | Platform | Driver Required | Package |
-|----------|----------------|---------|
+| --- | --- | --- |
 | Google Chrome | `chromedriver` | `G4.WebDriver.Remote.Chrome` |
 | Microsoft Edge | `msedgedriver` | `G4.WebDriver.Remote.Edge` |
 | Mozilla Firefox | `geckodriver` | `G4.WebDriver.Remote.Firefox` |
@@ -114,6 +117,7 @@ driver.Quit();
 | iOS | Appium Server | `G4.WebDriver.Remote.Ios` |
 | macOS | Appium Server | `G4.WebDriver.Remote.MacOs` |
 | Windows Desktop | UIA WebDriver | `G4.WebDriver.Remote.Uia` |
+| SAP GUI for Windows | SAP WebDriver (`Sap.DriverServer.exe`) | `G4.WebDriver.Remote.Sap` |
 | Any (Remote) | Any WebDriver endpoint | `G4.WebDriver` |
 | None (Mock) | N/A | `G4.WebDriver.Simulator` |
 
@@ -197,6 +201,55 @@ using var driver = new FirefoxDriver(service, options, TimeSpan.FromSeconds(30))
 using var driver = new FirefoxDriver(new Uri("http://localhost:4444"), options);
 ```
 
+## SAP GUI Driver
+
+The `SapDriver` drives SAP GUI for Windows through the SAP WebDriver server (`Sap.DriverServer.exe`). The
+server attaches each WebDriver session to a SAP GUI session that is already open; it never starts SAP GUI or
+logs on. SAP GUI Scripting must be enabled on the SAP server and in the SAP GUI options before you start; the
+driver does not turn it on.
+
+`SapOptions` chooses the SAP GUI session. Set `SessionPath`, or `ConnectionIndex` and `SessionIndex`, to pick
+one directly. `SystemName`, `Client`, and `ConnectionDescription` narrow the candidates instead. With nothing
+set, the server attaches to the only open session.
+
+```csharp
+using G4.WebDriver.Models;
+using G4.WebDriver.Remote.Sap;
+
+// Attach to the first session of the first SAP GUI connection on a running server
+var options = new SapOptions
+{
+    ConnectionIndex = 0,
+    SessionIndex = 0
+};
+
+using var driver = new SapDriver(new Uri("http://localhost:5556"), options);
+
+// Send Enter (virtual key 0) to the current window, then read the status bar
+driver.SendVirtualKey(0);
+var statusBar = driver.GetStatusBar();
+Console.WriteLine($"{statusBar.MessageType}: {statusBar.Text}");
+
+// Call an allow-listed SAP GUI Scripting method on a control
+var grid = (SapElement)driver.FindElement(By.Xpath("//GuiShell[@subType='GridView']"));
+grid.InvokeMethod("pressToolbarButton", "&MB_FILTER");
+
+// Read the SAP object model document of the session
+var document = driver.GetDocument();
+```
+
+**SAP-specific commands:**
+
+| Member | Description |
+| --- | --- |
+| `SapDriver.SendVirtualKey` | Sends a SAP virtual key, such as 0 for Enter or 3 for Back, to a window |
+| `SapDriver.GetStatusBar` | Returns the message type, ID, number, and text of the status bar |
+| `SapDriver.GetDocument` | Returns the SAP object model XML of the session or of a located element |
+| `SapElement.InvokeMethod` | Calls an allow-listed SAP GUI Scripting method on a control |
+| `SapElement.SetProperty` | Sets an allow-listed SAP GUI Scripting property on a control |
+
+The SAP server does not support raw User32 input, so `SapDriver` has no User32 commands.
+
 ## Simulator
 
 The `SimulatorDriver` provides a browser-less mock implementation of `IWebDriver` for unit testing. It returns simulated page sources, elements, navigation, and JavaScript execution without launching a real browser.
@@ -228,7 +281,7 @@ using var driver = new SimulatorDriver(session);
 **Configurable behaviors:**
 
 | Capability | Effect |
-|-----------|--------|
+| --- | --- |
 | `ChildWindows` | Number of child windows to simulate |
 | `ExceptionOnHandles` | Throw exception when accessing `WindowHandles` |
 | `ThrowOnClose` | Throw exception on `Close()` or `Quit()` |
@@ -276,7 +329,7 @@ var link = driver.FindElement(By.PartialLinkText("Sign"));
 ```
 
 | Method | Strategy |
-|--------|----------|
+| --- | --- |
 | `By.CssSelector(value)` | CSS selector |
 | `By.Xpath(value)` | XPath expression |
 | `By.TagName(value)` | HTML tag name |
