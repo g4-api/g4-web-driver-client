@@ -261,6 +261,25 @@ namespace G4.WebDriver.Tests
         }
 
         [TestMethod]
+        #region *** Data Set ***
+        [DataRow("ElementTextInput.html", "UrlDivText", "outerHTML", "<div id=\"UrlDivText\">Lorem ipsum dolor</div>")]
+        [DataRow("ElementTextInput.html", "UrlDivText", "OUTERHTML", "<div id=\"UrlDivText\">Lorem ipsum dolor</div>")]
+        [DataRow("ElementTextInput.html", "UrlDivText", "innerHTML", "Lorem ipsum dolor")]
+        #endregion
+        [TestCategory("Sanity"), TestCategory("Integration")]
+        public void GetMarkupAttributeTest(string url, string value, string attributeName, string expected) => Invoke(TestContext, url, (driver) =>
+        {
+            // Arrange: locate the element whose markup is read through the attribute API.
+            var element = driver.FindElement(By.Custom.Id(value));
+
+            // Act: request the markup name, in any casing, as an attribute.
+            var actual = element.GetAttribute(attributeName);
+
+            // Assert: the element markup is returned rather than null.
+            Assert.AreEqual(expected, actual);
+        });
+
+        [TestMethod]
         [DataRow("ElementInteractions.html", "ClickButton")]
         [TestCategory("Sanity"), TestCategory("Integration")]
         public void ClickElementTest(string url, string value) => Invoke(TestContext, url, (driver) =>
