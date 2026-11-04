@@ -22,6 +22,17 @@ namespace G4.WebDriver.Remote
     /// <remarks>This constructor sets up the WebElement with the provided WebDriver, ID, and retrieves the tag name of the element.</remarks>
     public class WebElement(IWebDriver driver, string id) : IWebElement, ILocatable
     {
+        #region *** Constants  ***
+        // Markup names that are DOM properties, not HTML attributes, mapped to their canonical
+        // property names. W3C Get Element Attribute returns only real attributes, so spec-strict
+        // drivers (e.g. geckodriver) answer null for these; they are read as properties instead.
+        private static readonly Dictionary<string, string> MarkupProperties = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["innerHTML"] = "innerHTML",
+            ["outerHTML"] = "outerHTML"
+        };
+        #endregion
+
         #region *** Fields     ***
         // The invoker responsible for executing WebDriver commands.
         private readonly IWebDriverCommandInvoker _invoker = driver.Invoker;
@@ -151,6 +162,13 @@ namespace G4.WebDriver.Remote
         /// <inheritdoc />
         public string GetAttribute(string attributeName)
         {
+            // Route markup names (outerHTML, innerHTML) to Get Element Property so every W3C driver
+            // returns the element markup instead of null on spec-strict drivers
+            if (attributeName != null && MarkupProperties.TryGetValue(attributeName, out var propertyName))
+            {
+                return GetProperty(propertyName);
+            }
+
             // Prepare the WebDriver command for retrieving the value of an attribute for the current WebElement
             var command = WebDriverCommands
                 .GetElementAttribute
