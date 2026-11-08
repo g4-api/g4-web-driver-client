@@ -250,6 +250,114 @@ var document = driver.GetDocument();
 
 The SAP server does not support raw User32 input, so `SapDriver` has no User32 commands.
 
+## UIA Driver
+
+The `UiaDriver` drives Windows desktop applications through the UIA WebDriver server (see the
+`uia-driver-server` repository, which listens on port 5555 by default). A session is bound to one
+application that the server starts, or to the whole desktop when you set no `App`.
+
+`UiaOptions` describes the application. `App` is the file to start and `Arguments` are its command-line
+arguments. `WorkingDirectory` sets the folder to start in. With `Mount` set, the server attaches to a
+process that is already running instead of starting one. `Impersonation` starts the process as another user.
+Leave `App` empty for a desktop session.
+
+```csharp
+using G4.WebDriver.Models;
+using G4.WebDriver.Remote;
+using G4.WebDriver.Remote.Uia;
+
+// Start Notepad with an argument and a working directory
+var options = new UiaOptions
+{
+    App = @"C:\Windows\System32\notepad.exe",
+    Arguments = ["notes.txt"],
+    WorkingDirectory = @"C:\Temp"
+};
+
+using var driver = new UiaDriver(new Uri("http://localhost:5555/wd/hub"), options);
+
+// Type with user32 input, then read the edit control
+driver.SendKeys("Hello");
+var edit = driver.FindElement(By.Xpath("//Edit"));
+Console.WriteLine(edit.Text);
+
+driver.Quit();
+```
+
+For a desktop session, pass `new UiaOptions()` and find elements anywhere on the desktop.
+
+**UIA-specific members:**
+
+| Member | Description |
+| --- | --- |
+| `UiaOptions.App` | The file to start. Empty means a desktop session |
+| `UiaOptions.Arguments` | Command-line arguments for `App` |
+| `UiaOptions.WorkingDirectory` | The folder the process starts in |
+| `UiaOptions.Mount` | Attach to a running process instead of starting one |
+| `UiaOptions.Impersonation` | Domain, user name and password to start the process as another user |
+| `UiaDriver.SendKeys` | Sends text as user32 input, with an optional delay or repeat count |
+| `UiaDriver.SendInputs` | Sends scan codes as user32 input, with an optional repeat count |
+
+## Mobile and Appium Drivers
+
+The Android and iOS packages share the Appium base in `G4.WebDriver.Remote.Appium`. That base adds
+`IsOnScreenKeyboardVisible`, `ShowKeyboard`, `HideKeyboard` and the geolocation members. All of them need a
+running Appium server.
+
+```csharp
+using G4.WebDriver.Extensions;
+using G4.WebDriver.Models;
+using G4.WebDriver.Remote;
+using G4.WebDriver.Remote.Android;
+using G4.WebDriver.Remote.Ios;
+
+// Android: connect with a URL and options
+var androidOptions = new AndroidOptions();
+androidOptions.AddCapabilities("platformName", "Android");
+
+using var android = new AndroidDriver(new Uri("http://127.0.0.1:4723/wd/hub"), androidOptions);
+android.HideKeyboard();
+
+// iOS: IosDriver takes a command invoker and a session, so build both
+var iosOptions = new IosOptions();
+iosOptions.AddCapabilities("platformName", "iOS");
+
+var session = iosOptions.ConvertToCapabilities().NewSessionModel();
+var invoker = new WebDriverCommandInvoker(new Uri("http://127.0.0.1:4723/wd/hub"), TimeSpan.FromMinutes(1));
+
+using var ios = new IosDriver(invoker, session);
+var keyboardVisible = ios.IsOnScreenKeyboardVisible;
+```
+
+The `G4.WebDriver.Remote.MacOs` package has no driver class of its own yet. To drive macOS through Appium,
+use `RemoteWebDriver` with the capabilities your Appium macOS driver expects:
+
+```csharp
+using G4.WebDriver.Models;
+using G4.WebDriver.Remote;
+
+var macSession = new SessionModel
+{
+    Capabilities = new CapabilitiesModel
+    {
+        AlwaysMatch = new Dictionary<string, object>
+        {
+            ["platformName"] = "mac",
+            ["appium:automationName"] = "Mac2",
+            ["appium:bundleId"] = "com.apple.TextEdit"
+        }
+    }
+};
+
+using var mac = new RemoteWebDriver("http://127.0.0.1:4723/wd/hub", macSession);
+mac.Quit();
+```
+
+The capability names in the macOS example are Appium's, not this library's. Check them against the
+documentation of the Appium macOS driver you use.
+
+See the [package to driver map](docs/package-to-driver-map.md) for how each package relates to the G4 driver names.
+
 ## Simulator
 
 The `SimulatorDriver` provides a browser-less mock implementation of `IWebDriver` for unit testing. It returns simulated page sources, elements, navigation, and JavaScript execution without launching a real browser.
@@ -359,7 +467,7 @@ dotnet restore src/G4.sln
 dotnet build src/G4.sln
 ```
 
-4. Run the tests:
+Then run the tests:
 
 ```bash
 dotnet test src/G4.sln
@@ -372,3 +480,7 @@ Please open an issue or submit a pull request on [GitHub](https://github.com/g4-
 ## License
 
 This project is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+## Contributing and builds
+
+Build tools, test commands, version numbers, Docker images and development ports are in the [build, test and release guide](../g4-github-actions/docs/build-test-release.md).
