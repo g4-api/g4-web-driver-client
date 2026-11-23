@@ -454,6 +454,64 @@ namespace G4.WebDriver.Tests
             Assert.AreEqual("Lorem ipsum dolor", actual);
         });
 
+        [TestMethod(DisplayName = "Verify that GetShadowRoot returns a closed shadow root and " +
+            "that an element inside it is found by a CSS selector.")]
+        #region *** Data Set ***
+        [DataRow("ElementShadowRoot.html")]
+        #endregion
+        [TestCategory("Sanity"), TestCategory("Integration")]
+        public void GetShadowRootClosedModeTest(string url) => Invoke(TestContext, url, (driver) =>
+        {
+            // Arrange: resolve the host whose shadow root the page attached in closed mode.
+            var host = driver.FindElement(By.Custom.Id("ClosedShadowComponent"));
+
+            // Act: get the shadow root through the WebDriver command and search inside it.
+            var root = host.GetShadowRoot();
+            var actual = root.FindElement(By.CssSelector("#ClosedTextInput")).GetProperty("title");
+
+            // Assert: the closed shadow root exposes its inner element.
+            Assert.AreEqual("Consectetur adipiscing", actual);
+        });
+
+        [TestMethod(DisplayName = "Verify that FindElements on a shadow root returns every " +
+            "matching element inside the shadow DOM.")]
+        #region *** Data Set ***
+        [DataRow("ElementShadowRoot.html")]
+        #endregion
+        [TestCategory("Sanity"), TestCategory("Integration")]
+        public void GetShadowRootFindElementsTest(string url) => Invoke(TestContext, url, (driver) =>
+        {
+            // Arrange: get the shadow root of the open component, which holds two inputs.
+            var root = driver.FindElement(By.Custom.Id("ShadowComponent")).GetShadowRoot();
+
+            // Act: collect the titles of every input inside the shadow root.
+            var actual = root
+                .FindElements(By.CssSelector("input"))
+                .Select(input => input.GetProperty("title"))
+                .ToArray();
+
+            // Assert: both inputs are returned, in document order.
+            CollectionAssert.AreEqual(new[] { "Lorem ipsum dolor", "Sit amet" }, actual);
+        });
+
+        [TestMethod(DisplayName = "Verify that GetShadowRoot returns null for an element " +
+            "that has no shadow root.")]
+        #region *** Data Set ***
+        [DataRow("ElementShadowRoot.html")]
+        #endregion
+        [TestCategory("Sanity"), TestCategory("Integration")]
+        public void GetShadowRootNoShadowRootTest(string url) => Invoke(TestContext, url, (driver) =>
+        {
+            // Arrange: resolve an ordinary element that never attached a shadow root.
+            var element = driver.FindElement(By.CssSelector("h1"));
+
+            // Act: ask for its shadow root.
+            var actual = element.GetShadowRoot();
+
+            // Assert: a missing shadow root is a null result, not an exception.
+            Assert.IsNull(actual);
+        });
+
         [TestMethod]
         [DataRow("ElementShadowRoot.html")]
         [TestCategory("Sanity"), TestCategory("Integration")]

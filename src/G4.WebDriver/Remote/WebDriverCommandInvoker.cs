@@ -346,7 +346,8 @@ namespace G4.WebDriver.Remote
             invocation.Route = invocation
                 .Route
                 .Replace("$[session]", invocation.Session)
-                .Replace("$[element]", invocation.Element);
+                .Replace("$[element]", invocation.Element)
+                .Replace("$[shadow]", invocation.Shadow);
 
             // Normalize the server address once so event observers and transport use the same endpoint root.
             var serverAddress = ServerAddress.AbsoluteUri.Trim('/');

@@ -540,29 +540,48 @@ namespace G4.WebDriver.Extensions
         /// Retrieves the shadow root of the specified web element. The shadow root allows access to the shadow DOM,
         /// which is a separate DOM tree associated with a web component.
         /// </summary>
+        /// <remarks>
+        /// Uses the WebDriver "Get Element Shadow Root" command instead of reading the element's
+        /// <c>shadowRoot</c> script property, so a closed shadow root is returned as well as an open one.
+        /// An element without a shadow root yields <c>null</c>, keeping the missing root a normal result
+        /// rather than an exception.
+        /// </remarks>
         /// <param name="element">The IWebElement representing the element with a shadow DOM.</param>
         /// <returns>Returns an ISearchContext representing the shadow root, or null if the shadow root is not found.</returns>
         public static ISearchContext GetShadowRoot(this IWebElement element)
         {
-            // JavaScript to retrieve the shadow root of the element.
-            const string Script = "return arguments[0].shadowRoot;";
-
             // The property name used to identify the shadow root in the WebDriver protocol.
             const string PropertyName = "shadow-6066-11e4-a52e-4f735466cecf";
 
-            // Invoke the script to get the shadow root of the element.
-            var shadowRoot = element.Driver.InvokeScript(Script, element);
+            // Address the command to the host element within the driver's current session.
+            var invoker = element.Driver.Invoker;
+            var session = invoker.Session.OpaqueKey;
+            var command = WebDriverCommands.GetElementShadowRoot.SetSession(session).SetElement(element.Id);
 
-            // If the shadow root is null or empty, return null.
-            if (shadowRoot == null || string.IsNullOrEmpty($"{shadowRoot}"))
+            // Ask the WebDriver service for the shadow root; an element without one is reported by the
+            // service as an error, which this method turns into the documented null result.
+            JsonElement shadowRoot;
+
+            try
+            {
+                shadowRoot = (JsonElement)invoker.Invoke(command).Value;
+            }
+            catch (NoSuchShadowRootException)
             {
                 return null;
             }
 
-            // Retrieve the shadow root's unique ID from the returned JSON object.
-            var id = ((JsonElement)shadowRoot)
-                .GetProperty(PropertyName)
-                .GetString();
+            // Treat a response without a shadow root reference the same way as a missing shadow root.
+            var isObject = shadowRoot.ValueKind == JsonValueKind.Object;
+            var isReference = isObject && shadowRoot.TryGetProperty(PropertyName, out _);
+
+            if (!isReference)
+            {
+                return null;
+            }
+
+            // Read the shadow root's unique ID from the reference the WebDriver service returned.
+            var id = shadowRoot.GetProperty(PropertyName).GetString();
 
             // Return a new ShadowRoot object that allows interaction with the shadow DOM.
             return new ShadowRoot(element.Driver, id);
