@@ -16,6 +16,11 @@ namespace G4.WebDriver.Remote
     /// Represents a shadow DOM root, allowing interaction with shadow DOM elements.
     /// Implements the <see cref="ISearchContext"/>, <see cref="IDriverReference"/>, and <see cref="IIdentifierReference"/> interfaces.
     /// </summary>
+    /// <remarks>
+    /// A search inside a shadow root uses the dedicated WebDriver shadow routes, because a WebDriver service
+    /// does not accept a shadow root id on the element routes. Browser drivers resolve only CSS selectors
+    /// inside a shadow root; other locator strategies are rejected by the driver as an invalid argument.
+    /// </remarks>
     /// <param name="driver">The WebDriver instance used to interact with the browser.</param>
     /// <param name="id">The unique identifier of the shadow DOM root.</param>
     public class ShadowRoot(IWebDriver driver, string id) : ISearchContext, IDriverReference, IIdentifierReference
@@ -51,11 +56,12 @@ namespace G4.WebDriver.Remote
             // Prepare data for the WebDriver command using the locator details.
             var data = new { by.Using, by.Value };
 
-            // Set up the command to find an element within the shadow DOM root.
+            // Address the search to this shadow root through the shadow route, so the WebDriver service
+            // receives the shadow root id where it expects one instead of on an element route.
             var command = WebDriverCommands
-                .FindElementFromElement
+                .FindElementFromShadowRoot
                 .SetSession(_sessionId.OpaqueKey)
-                .SetElement(Id)
+                .SetShadow(Id)
                 .SetData(data);
 
             // Invoke the command and get the response from the browser.
@@ -79,11 +85,12 @@ namespace G4.WebDriver.Remote
             // Prepare data for the WebDriver command using the locator details.
             var data = new { by.Using, by.Value };
 
-            // Set up the command to find elements within the shadow DOM root.
+            // Address the search to this shadow root through the shadow route, so the WebDriver service
+            // receives the shadow root id where it expects one instead of on an element route.
             var command = WebDriverCommands
-                .FindElementsFromElement
+                .FindElementsFromShadowRoot
                 .SetSession(_sessionId.OpaqueKey)
-                .SetElement(Id)
+                .SetShadow(Id)
                 .SetData(data);
 
             // Invoke the command and get the response from the browser.

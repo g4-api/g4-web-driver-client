@@ -45,6 +45,16 @@ namespace G4.WebDriver.Models
         /// </summary>
         public string Session { get; set; }
 
+        /// <summary>
+        /// Gets or sets the shadow root id to send with the command.
+        /// </summary>
+        /// <remarks>
+        /// Resolves the <c>$[shadow]</c> route placeholder of the commands that search inside a shadow root.
+        /// It is kept apart from <see cref="Element"/> because a WebDriver service rejects a shadow root id
+        /// on an element route. Commands without that placeholder ignore it.
+        /// </remarks>
+        public string Shadow { get; set; }
+
         #endregion
 
         #region *** Methods      ***
@@ -69,7 +79,8 @@ namespace G4.WebDriver.Models
                 Headers = headers,
                 Method = Method,
                 Route = Route,
-                Session = Session
+                Session = Session,
+                Shadow = Shadow
             };
         }
 

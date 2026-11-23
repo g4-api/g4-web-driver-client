@@ -701,6 +701,22 @@ namespace G4.WebDriver.Extensions
         }
 
         /// <summary>
+        /// Sets the shadow root identifier for the <see cref="WebDriverCommandModel"/>.
+        /// </summary>
+        /// <param name="model">The <see cref="WebDriverCommandModel"/> instance to set the shadow root identifier for.</param>
+        /// <param name="shadow">The shadow root identifier that resolves the <c>$[shadow]</c> route placeholder.</param>
+        /// <returns>The modified <see cref="WebDriverCommandModel"/> instance with the new shadow root identifier set.</returns>
+        public static WebDriverCommandModel SetShadow(this WebDriverCommandModel model, string shadow)
+        {
+            // Keep the shadow root identifier apart from the element identifier so the invoker resolves the
+            // shadow routes, which are the only routes a WebDriver service accepts a shadow root on.
+            model.Shadow = shadow;
+
+            // Return the modified model to allow for fluent chaining.
+            return model;
+        }
+
+        /// <summary>
         /// Attempts to get the value associated with the specified key in a case-insensitive manner.
         /// If the dictionary is already using a case-insensitive comparer, it utilizes the standard TryGetValue.
         /// Otherwise, it performs a case-insensitive search.

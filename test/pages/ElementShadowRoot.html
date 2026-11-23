@@ -9,6 +9,8 @@
 
     <div id="ShadowComponent"></div>
 
+    <div id="ClosedShadowComponent"></div>
+
     <script>
         // Get the element with the ID ShadowComponent
         const element = document.getElementById('ShadowComponent');
@@ -28,6 +30,26 @@
 
         // Append the input element to the shadow DOM
         shadowRoot.appendChild(inputElement);
+
+        // Add a second input, so a search for several elements inside the shadow DOM has more than one match
+        const secondInputElement = document.createElement('input');
+
+        secondInputElement.setAttribute('title', 'Sit amet');
+        secondInputElement.setAttribute('type', 'text');
+        secondInputElement.setAttribute('id', 'TextInputSecondary');
+        shadowRoot.appendChild(secondInputElement);
+
+        // Attach a shadow DOM in closed mode: the page script cannot read it through element.shadowRoot,
+        // while the WebDriver "Get Element Shadow Root" command still returns it
+        const closedShadowRoot = document
+            .getElementById('ClosedShadowComponent')
+            .attachShadow({ mode: 'closed' });
+        const closedInputElement = document.createElement('input');
+
+        closedInputElement.setAttribute('title', 'Consectetur adipiscing');
+        closedInputElement.setAttribute('type', 'text');
+        closedInputElement.setAttribute('id', 'ClosedTextInput');
+        closedShadowRoot.appendChild(closedInputElement);
     </script>
 
 </body>
