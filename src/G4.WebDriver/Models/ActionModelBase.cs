@@ -8,6 +8,7 @@ namespace G4.WebDriver.Models
     [JsonDerivedType(derivedType: typeof(KeyboardActionModel), typeDiscriminator: "KeyboardAction")]
     [JsonDerivedType(derivedType: typeof(MouseActionModel), typeDiscriminator: "MouseAction")]
     [JsonDerivedType(derivedType: typeof(NullActionModel), typeDiscriminator: "NullAction")]
+    [JsonDerivedType(derivedType: typeof(WheelActionModel), typeDiscriminator: "WheelAction")]
     [JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor)]
     public abstract class ActionModelBase
     {

@@ -68,9 +68,26 @@
             public const int Left = 0;
 
             /// <summary>
+            /// Represents the middle mouse button, which on most mice is the wheel button.
+            /// </summary>
+            public const int Middle = 1;
+
+            /// <summary>
             /// Represents the right mouse button.
             /// </summary>
             public const int Right = 2;
+
+            /// <summary>
+            /// Represents the back mouse button, the first of the two side buttons.
+            /// </summary>
+            /// <remarks>Browsers map it to history navigation; a driver without side-button support rejects it.</remarks>
+            public const int Back = 3;
+
+            /// <summary>
+            /// Represents the forward mouse button, the second of the two side buttons.
+            /// </summary>
+            /// <remarks>Browsers map it to history navigation; a driver without side-button support rejects it.</remarks>
+            public const int Forward = 4;
         }
         #endregion
     }
