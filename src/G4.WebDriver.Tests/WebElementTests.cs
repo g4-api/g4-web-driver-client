@@ -491,7 +491,9 @@ namespace G4.WebDriver.Tests
                 .ToArray();
 
             // Assert: both inputs are returned, in document order.
-            CollectionAssert.AreEqual(new[] { "Lorem ipsum dolor", "Sit amet" }, actual);
+            string[] expected = ["Lorem ipsum dolor", "Sit amet"];
+
+            Assert.AreSequenceEqual(expected, actual);
         });
 
         [TestMethod(DisplayName = "Verify that GetShadowRoot returns null for an element " +
