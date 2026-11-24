@@ -12,19 +12,60 @@ namespace G4.WebDriver.Remote.Interactions
     /// </summary>
     public class ActionSequence
     {
+        #region *** Constants     ***
+        // Lists the pointer types a pointer source accepts. The constructor checks against it, so an unknown
+        // type fails when the sequence is created and not later as a driver error.
+        private static readonly HashSet<string> SupportedPointerTypes =
+        [
+            PointerTypes.Mouse,
+            PointerTypes.Pen,
+            PointerTypes.Touch
+        ];
+        #endregion
+
         #region *** Fields        ***
         public readonly InputSourceModel _keySource;   // Private field to store the keyboard input source
         public readonly InputSourceModel _mouseSource; // Private field to store the mouse input source
         private readonly IWebDriver _driver;           // Private field to store the WebDriver instance
+
+        // Holds the wheel actions of this sequence. It stays empty until the first scroll is added and is sent
+        // only when it holds an action, so a sequence without scrolling still sends the two original sources.
+        private readonly InputSourceModel _wheelSource;
         #endregion
 
         #region *** Constructors  ***
         /// <summary>
-        /// Initializes a new instance of the <see cref="ActionSequence"/> class.
+        /// Initializes a new instance of the <see cref="ActionSequence"/> class with a mouse pointer.
         /// </summary>
         /// <param name="driver">The <see cref="IWebDriver"/> instance to use for actions.</param>
         public ActionSequence(IWebDriver driver)
+            : this(driver, pointerType: PointerTypes.Mouse)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ActionSequence"/> class with a pointer of the given type.
+        /// </summary>
+        /// <remarks>
+        /// The pointer type is fixed for the lifetime of the sequence and decides which events the application
+        /// receives for the pointer actions (mouse, pen or touch events). The sequence owns one pointer source,
+        /// one keyboard source and one wheel source; it does not model several pointers at once.
+        /// </remarks>
+        /// <param name="driver">The <see cref="IWebDriver"/> instance to use for actions.</param>
+        /// <param name="pointerType">The pointer type, one of the <see cref="PointerTypes"/> values.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown if <paramref name="pointerType"/> is not a known pointer type.
+        /// </exception>
+        public ActionSequence(IWebDriver driver, string pointerType)
         {
+            // Reject an unknown pointer type before any source is built, so a typo fails here with the list
+            // of accepted values and not as an "invalid argument" answer from the driver.
+            if (!SupportedPointerTypes.Contains(pointerType))
+            {
+                var message = $"The pointer type '{pointerType}' is not supported. " +
+                    $"Supported types: {string.Join(", ", SupportedPointerTypes)}.";
+                throw new ArgumentException(message, nameof(pointerType));
+            }
+
             // Store the driver instance
             _driver = driver;
 
@@ -36,21 +77,85 @@ namespace G4.WebDriver.Remote.Interactions
                 Actions = []
             };
 
-            // Initialize the mouse input source
+            // Initialize the pointer input source; the source id carries the pointer type, which keeps the
+            // original "default mouse" id for a mouse pointer.
             _mouseSource = new InputSourceModel
             {
                 Type = InputSourceTypes.Pointer,
-                Id = "default mouse",
+                Id = $"default {pointerType}",
                 Parameters = new Dictionary<string, object>
                 {
-                    ["pointerType"] = "mouse"
+                    ["pointerType"] = pointerType
                 },
+                Actions = []
+            };
+
+            // Initialize the wheel input source; it is created up front and joins the request only after a
+            // scroll is added.
+            _wheelSource = new InputSourceModel
+            {
+                Type = InputSourceTypes.Wheel,
+                Id = "default wheel",
                 Actions = []
             };
         }
         #endregion
 
         #region *** Methods       ***
+        /// <summary>
+        /// Adds one raw action to the sequence and routes it to the input source that owns its type.
+        /// </summary>
+        /// <remarks>
+        /// This is the low-level entry point: the caller builds the action model and the sequence only places
+        /// it. A <see cref="KeyboardActionModel"/> goes to the keyboard source, a <see cref="MouseActionModel"/>
+        /// to the pointer source and a <see cref="WheelActionModel"/> to the wheel source; a
+        /// <see cref="NullActionModel"/> (a pause) holds the keyboard and pointer sources together. Every action
+        /// takes a tick of its own, so the driver runs the actions in the order they were added. Nothing is sent
+        /// until <see cref="Invoke"/> is called. The driver reads the duration of a pointer move and of a pause,
+        /// so set <see cref="ActionModelBase.Duration"/> on those models; a missing duration is sent as null.
+        /// </remarks>
+        /// <param name="action">The action to add.</param>
+        /// <returns>The current <see cref="ActionSequence"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="action"/> is null.</exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the type of <paramref name="action"/> has no input source.
+        /// </exception>
+        public ActionSequence AddAction(ActionModelBase action)
+        {
+            // Require the action before its type selects the input source that receives it.
+            ArgumentNullException.ThrowIfNull(argument: action);
+
+            // Wrap the single action once, because the source helpers take collections of actions.
+            var actions = new[] { action };
+
+            // Route the action to the source that owns its type. Every branch leaves the keyboard and pointer
+            // sources with the same number of ticks, which is what keeps the actions in the order they were added.
+            switch (action)
+            {
+                case KeyboardActionModel:
+                    AddKeyboardActions(keySource: _keySource, mouseSource: _mouseSource, actions);
+                    break;
+                case MouseActionModel:
+                    AddMouseActions(mouseSource: _mouseSource, keySource: _keySource, actions);
+                    break;
+                case WheelActionModel:
+                    AddWheelAction(sequence: this, action);
+                    break;
+                case NullActionModel:
+                    // A pause belongs to no single device, so it holds both sources for the same tick.
+                    _keySource.Actions.Add(action);
+                    _mouseSource.Actions.Add(action);
+                    break;
+                default:
+                    // Report the unknown model by name, because no input source can carry it to the driver.
+                    var message = $"The action type '{action.GetType().Name}' has no input source in this sequence.";
+                    throw new ArgumentException(message, nameof(action));
+            }
+
+            // Return the current instance for chaining
+            return this;
+        }
+
         /// <summary>
         /// Adds a click action at the current mouse cursor position.
         /// </summary>
@@ -510,6 +615,140 @@ namespace G4.WebDriver.Remote.Interactions
         }
 
         /// <summary>
+        /// Adds a press of the left pointer button at the current pointer position, without releasing it.
+        /// </summary>
+        /// <remarks>
+        /// The button stays pressed after the sequence is sent, until a pointer up action or
+        /// <see cref="ClearActions"/> releases it.
+        /// </remarks>
+        /// <returns>The current <see cref="ActionSequence"/> instance.</returns>
+        public ActionSequence AddPointerDown()
+        {
+            // Press the left button, the primary button of every pointer type.
+            return AddPointerDown(button: MouseActionModel.MouseButtons.Left);
+        }
+
+        /// <summary>
+        /// Adds a press of the given pointer button at the current pointer position, without releasing it.
+        /// </summary>
+        /// <remarks>
+        /// The press and the release are separate actions, which is what makes drag, press-and-hold and
+        /// modifier-style gestures possible. The button stays pressed after the sequence is sent, until a
+        /// pointer up action for the same button or <see cref="ClearActions"/> releases it.
+        /// </remarks>
+        /// <param name="button">
+        /// The button to press, one of the <see cref="MouseActionModel.MouseButtons"/> values.
+        /// </param>
+        /// <returns>The current <see cref="ActionSequence"/> instance.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="button"/> is negative.</exception>
+        public ActionSequence AddPointerDown(int button)
+        {
+            // Reject a negative button here, because the driver accepts only an unsigned button number.
+            ArgumentOutOfRangeException.ThrowIfNegative(value: button);
+
+            // Describe the press alone; the release is a separate action the caller adds when the gesture ends.
+            var action = new MouseActionModel
+            {
+                Button = button,
+                Type = MouseActionModel.ActionTypes.PointerDown
+            };
+
+            // Place the press on its own tick of the pointer source.
+            return AddAction(action);
+        }
+
+        /// <summary>
+        /// Adds a release of the left pointer button at the current pointer position.
+        /// </summary>
+        /// <returns>The current <see cref="ActionSequence"/> instance.</returns>
+        public ActionSequence AddPointerUp()
+        {
+            // Release the left button, the primary button of every pointer type.
+            return AddPointerUp(button: MouseActionModel.MouseButtons.Left);
+        }
+
+        /// <summary>
+        /// Adds a release of the given pointer button at the current pointer position.
+        /// </summary>
+        /// <remarks>
+        /// Releasing a button that is not pressed is not an error; the driver ignores it. The release can be
+        /// sent in a later sequence than the press, because the driver keeps the input state between requests.
+        /// </remarks>
+        /// <param name="button">
+        /// The button to release, one of the <see cref="MouseActionModel.MouseButtons"/> values.
+        /// </param>
+        /// <returns>The current <see cref="ActionSequence"/> instance.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="button"/> is negative.</exception>
+        public ActionSequence AddPointerUp(int button)
+        {
+            // Reject a negative button here, because the driver accepts only an unsigned button number.
+            ArgumentOutOfRangeException.ThrowIfNegative(value: button);
+
+            // Describe the release alone, so it can end a press that an earlier action or sequence started.
+            var action = new MouseActionModel
+            {
+                Button = button,
+                Type = MouseActionModel.ActionTypes.PointerUp
+            };
+
+            // Place the release on its own tick of the pointer source.
+            return AddAction(action);
+        }
+
+        /// <summary>
+        /// Adds a wheel scroll that starts at the top-left corner of the viewport.
+        /// </summary>
+        /// <remarks>
+        /// The driver scrolls the scrollable container under the start point, which for this overload is
+        /// usually the page itself. Use the element overload to scroll a container inside the page.
+        /// </remarks>
+        /// <param name="deltaX">The horizontal scroll amount in pixels; a positive value scrolls right.</param>
+        /// <param name="deltaY">The vertical scroll amount in pixels; a positive value scrolls down.</param>
+        /// <returns>The current <see cref="ActionSequence"/> instance.</returns>
+        public ActionSequence AddScroll(int deltaX, int deltaY)
+        {
+            // Describe a scroll from the viewport origin; the model's default origin is the viewport.
+            var action = new WheelActionModel
+            {
+                DeltaX = deltaX,
+                DeltaY = deltaY
+            };
+
+            // Place the scroll on its own tick of the wheel source.
+            return AddAction(action);
+        }
+
+        /// <summary>
+        /// Adds a wheel scroll that starts at the center of the given element.
+        /// </summary>
+        /// <remarks>
+        /// The driver scrolls the nearest scrollable container under the element's center, so this overload
+        /// scrolls a list, a text area or another container without moving the pointer first. The driver
+        /// reports an error when the element's center is outside the viewport.
+        /// </remarks>
+        /// <param name="element">The element whose center is the scroll start point.</param>
+        /// <param name="deltaX">The horizontal scroll amount in pixels; a positive value scrolls right.</param>
+        /// <param name="deltaY">The vertical scroll amount in pixels; a positive value scrolls down.</param>
+        /// <returns>The current <see cref="ActionSequence"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="element"/> is null.</exception>
+        public ActionSequence AddScroll(IWebElement element, int deltaX, int deltaY)
+        {
+            // Require the element before its reference becomes the scroll origin.
+            ArgumentNullException.ThrowIfNull(argument: element);
+
+            // Describe a scroll that starts from the element, using the element reference the driver expects.
+            var action = new WheelActionModel
+            {
+                DeltaX = deltaX,
+                DeltaY = deltaY,
+                Origin = element.ConvertToDictionary()
+            };
+
+            // Place the scroll on its own tick of the wheel source.
+            return AddAction(action);
+        }
+
+        /// <summary>
         /// The Release Actions command is used to release all the keys and pointer buttons that are currently depressed.
         /// This causes events to be fired as if the state was released by an explicit series of actions.
         /// It also clears all the internal state of the virtual devices.
@@ -538,6 +777,9 @@ namespace G4.WebDriver.Remote.Interactions
                 // Clear actions from both key and mouse action sources
                 _keySource.Actions.Clear();
                 _mouseSource.Actions.Clear();
+
+                // Clear the wheel source with them, so a reused sequence starts with every source empty.
+                _wheelSource.Actions.Clear();
             }
 
             // Return the current instance for chaining
@@ -545,18 +787,38 @@ namespace G4.WebDriver.Remote.Interactions
         }
 
         /// <summary>
+        /// Gets the input sources this sequence sends when it is invoked, in the order they are sent.
+        /// </summary>
+        /// <remarks>
+        /// The pointer and keyboard sources are always included. The wheel source is included only when it
+        /// holds an action, so a driver that does not know wheel sources never receives one from a sequence
+        /// that does not scroll. The returned models are the live sources of the sequence, not copies.
+        /// </remarks>
+        /// <returns>The input sources that <see cref="Invoke"/> sends.</returns>
+        public IEnumerable<InputSourceModel> GetInputSources()
+        {
+            // Start with the two sources every sequence sends, in the order the request always used.
+            var sources = new List<InputSourceModel> { _mouseSource, _keySource };
+
+            // Add the wheel source only when a scroll was added, which keeps the request of a sequence
+            // without scrolling identical to the one sent before wheel support existed.
+            if (_wheelSource.Actions.Count > 0)
+            {
+                sources.Add(_wheelSource);
+            }
+
+            return sources;
+        }
+
+        /// <summary>
         /// Invokes the WebDriver actions by sending the mouse and key actions to the driver.
         /// </summary>
         public void Invoke()
         {
-            // Create a data object containing mouse and key actions.
+            // Create a data object containing the mouse and key sources, and the wheel source when it has actions.
             var data = new
             {
-                Actions = new object[]
-                {
-                    _mouseSource,
-                    _keySource
-                }
+                Actions = GetInputSources().ToArray()
             };
 
             // Invoke the WebDriver commands and pass the action data.
@@ -611,6 +873,33 @@ namespace G4.WebDriver.Remote.Interactions
                 keySource.Actions.Add(action);
                 mouseSource.Actions.Add(pause);
             }
+        }
+
+        // Adds one wheel action on a tick of its own and holds the pointer and keyboard sources for that tick.
+        // The wheel source is not padded while pointer and keyboard actions are added, so it can be shorter
+        // than the two other sources; this helper first brings it up to the current tick. It mutates the three
+        // sources of the given sequence and sends nothing.
+        private static void AddWheelAction(ActionSequence sequence, ActionModelBase action)
+        {
+            // Create a null action representing a pause.
+            var pause = new NullActionModel
+            {
+                Duration = 0,
+                Type = NullActionModel.ActionTypes.Pause
+            };
+
+            // Pad the wheel source up to the tick the other sources reached, so the scroll runs after every
+            // action that was added before it and not at the start of the sequence.
+            for (var i = sequence._wheelSource.Actions.Count; i < sequence._mouseSource.Actions.Count; i++)
+            {
+                sequence._wheelSource.Actions.Add(pause);
+            }
+
+            // Add the wheel action and hold the two other sources with a pause, so the next pointer or
+            // keyboard action runs after the scroll.
+            sequence._wheelSource.Actions.Add(action);
+            sequence._mouseSource.Actions.Add(pause);
+            sequence._keySource.Actions.Add(pause);
         }
         #endregion
 
