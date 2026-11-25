@@ -573,6 +573,32 @@ namespace G4.WebDriver.Simulator
             driver.WindowHandle = newHandle;
         }
 
+        // Simulates the Appium UiAutomator2 "mobile: startActivity" command. Android starts an activity only from a
+        // package/activity intent, so any other intent fails the way the device would and callers are tested against
+        // the real format.
+        [Description(@"^mobile:\s*startActivity$")]
+        private static string GetStartActivityScriptResult(string script, object[] args)
+        {
+            // Read the intent from the single options argument that Appium extension commands take. The script
+            // dispatcher can pass the caller arguments as one nested array, so unwrap that level first.
+            var argument = args?.Length > 0 ? args[0] : null;
+            argument = argument is object[] nested && nested.Length > 0 ? nested[0] : argument;
+            var options = argument as IDictionary<string, object>;
+            var intent = options?.TryGetValue("intent", out var value) == true ? $"{value}" : string.Empty;
+
+            // Accept only package/activity with both parts present, and reject everything else as the device does.
+            var parts = intent.Split('/');
+            var isIntent = parts.Length == 2 && parts.All(i => !string.IsNullOrWhiteSpace(i));
+            if (!isIntent)
+            {
+                var message = $"The command '{script}' cannot start '{intent}': the intent is not package/activity.";
+                throw new WebDriverException(message);
+            }
+
+            // Return an empty result, because the command reports success without a value.
+            return string.Empty;
+        }
+
         // Retrieves the outer HTML script result based on the provided script.
         [Description(@"^return arguments\[\d+\].outerHTML;$")]
         private static string GetOuterHtmlScriptResult(string script)

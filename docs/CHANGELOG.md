@@ -6,6 +6,14 @@ package versions.
 
 ## Unreleased
 
+### Added
+
+- `SimulatorDriver` answers the Appium `mobile: startActivity` command. It accepts a `package/activity` intent and
+  rejects any other intent with a `WebDriverException`, as an Android device does, so plugin tests can run activity
+  starts against the simulator.
+
+## 2026.11.25.20
+
 ### Changed
 
 - `MousePositionInputModel` offsets that the caller does not set now default by alignment: 0 for `MiddleCenter`, so
