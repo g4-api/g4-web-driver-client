@@ -444,6 +444,61 @@ var link = driver.FindElement(By.PartialLinkText("Sign"));
 | `By.LinkText(value)` | Exact link text |
 | `By.PartialLinkText(value)` | Partial link text |
 
+### Shadow DOM
+
+`GetShadowRoot` returns the shadow root of a host element as an `ISearchContext`. Search inside it with CSS
+selectors, the only strategy WebDriver allows in a shadow root:
+
+```csharp
+var host = driver.FindElement(By.CssSelector("lab-user-card"));
+var root = host.GetShadowRoot();
+var button = root.FindElement(By.CssSelector("button[name='follow-user']"));
+```
+
+- The client uses the WebDriver *Get Element Shadow Root* command, so open and closed shadow roots both work.
+- An element without a shadow root returns `null`.
+- A shadow root inside a shadow root is reached by calling `GetShadowRoot` on the inner host.
+
+## Input Actions
+
+`ActionSequence` builds one W3C *Perform Actions* request from a pointer source, a keyboard source and a wheel
+source, and `Invoke` sends it. Every `Add*` method returns the sequence, so calls chain:
+
+```csharp
+var source = driver.FindElement(By.CssSelector("#card"));
+
+new ActionSequence(driver)
+    .AddMoveMouseCursor(source)
+    .AddPointerDown(MouseActionModel.MouseButtons.Left)
+    .AddPauseAction(100)
+    .AddMoveMouseCursor(120, 0, ActionOrigins.Pointer)
+    .AddPointerUp(MouseActionModel.MouseButtons.Left)
+    .Invoke();
+```
+
+| Member | What it adds |
+| --- | --- |
+| `AddPointerDown()`, `AddPointerDown(button)` | Presses a pointer button; the default is the left button. |
+| `AddPointerUp()`, `AddPointerUp(button)` | Releases a pointer button; the default is the left button. |
+| `AddMoveMouseCursor(element)` | Moves the pointer to an element. |
+| `AddMoveMouseCursor(x, y, origin)` | Moves the pointer by or to a point; `origin` is `ActionOrigins.Pointer` or `ActionOrigins.Viewport`. |
+| `AddPauseAction(duration)` | A pause on the keyboard and pointer sources, in milliseconds. |
+| `AddScroll(deltaX, deltaY)`, `AddScroll(element, deltaX, deltaY)` | A wheel scroll from the viewport or from an element, in pixels. |
+| `AddAction(action)` | Any action model, placed on the source its type belongs to, in a tick of its own. |
+| `ClearActions()` | Releases every pressed key and button, and empties the sequence. |
+
+- `MouseActionModel.MouseButtons` names the buttons: `Left`, `Middle`, `Right`, `Back` and `Forward`.
+- `new ActionSequence(driver, pointerType)` picks the pointer device: `PointerTypes.Mouse` (the default),
+  `PointerTypes.Pen` or `PointerTypes.Touch`.
+
+### Mouse position on UIA elements
+
+`MousePositionInputModel` tells the UIA driver which point of an element to move to. `Alignment` picks a point of
+the element's rectangle, and `OffsetX` and `OffsetY` move it. An offset you do not set defaults by alignment:
+
+- `MiddleCenter` defaults to 0, so the point lands exactly on the center.
+- Every other alignment defaults to 1, one pixel inside the element.
+
 ## G4 Ecosystem
 
 G4.WebDriver is the browser and device automation foundation layer of the [G4 automation platform](https://github.com/g4-api). It is consumed as a NuGet dependency by other G4 components:
@@ -483,4 +538,5 @@ This project is licensed under the [Apache License 2.0](https://www.apache.org/l
 
 ## Contributing and builds
 
-Build tools, test commands, version numbers, Docker images and development ports are in the [build, test and release guide](../g4-github-actions/docs/build-test-release.md).
+Run `dotnet build` and `dotnet test` from `src/` with the .NET 10 SDK; the release pipeline builds, tests and
+publishes the NuGet packages from `main`. Changes are listed in the [changelog](docs/CHANGELOG.md).
