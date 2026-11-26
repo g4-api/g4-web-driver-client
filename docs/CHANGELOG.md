@@ -4,7 +4,7 @@ All notable changes to the G4.WebDriver packages are listed here. The format fol
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions match the GitHub release tags and the NuGet
 package versions.
 
-## Unreleased
+## 2026.11.25.21
 
 ### Added
 
